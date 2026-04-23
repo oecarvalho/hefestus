@@ -28,11 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html
+      suppressHydrationWarning
       lang="en"
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
       
-      <body className="min-h-full flex">
+      <body className="min-h-full flex" suppressHydrationWarning>
         <Sidebar/>
         <main className="flex-1">
           {children}
