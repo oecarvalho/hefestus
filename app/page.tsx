@@ -1,7 +1,7 @@
+import AddJobsButton from "@/components/add-jobs-button";
 import { GraficoAplicacoes } from "@/components/chart/chart";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, CheckCheck, CircleX, Plus, TrendingUp } from "lucide-react";
+import { Briefcase, CheckCheck, CircleX, TrendingUp } from "lucide-react";
 
 export default function Home() {
   return (
@@ -11,7 +11,8 @@ export default function Home() {
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground text-sm">Visão geral das suas candidaturas e performance.</p>
         </div>
-        <Button><Plus />Nova Vaga</Button>
+ 
+        <AddJobsButton/>
       </div>
 
       <div className="grid grid-cols-4 gap-4 my-6">
