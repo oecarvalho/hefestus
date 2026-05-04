@@ -21,13 +21,6 @@ export const Sidebar = () => {
                         Dashboard
                     </Link>
                 </Button>
-                <Button variant={pathname === '/profile' ? 'secondary' : 'ghost'}
-                    className="justify-start" asChild>
-                    <Link href='/profile'>
-                        <User />
-                        Perfil
-                    </Link>
-                </Button>
                 <Button variant={pathname === '/curriculo' ? 'secondary' : 'ghost'}
                     className="justify-start" asChild>
                     <Link href='/curriculo'>

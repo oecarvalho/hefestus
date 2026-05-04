@@ -41,7 +41,20 @@ const AddJobsButton = () => {
     })
 
     const onSubmit = (data: FormSchema) => {
-        console.log({ data })
+        const newJob = {
+            ...data,
+            id: crypto.randomUUID(),
+            createdAt: new Date().toISOString()
+        }
+
+        const storedJobs = localStorage.getItem('jobs')
+        const jobs = storedJobs ? JSON.parse(storedJobs) : []
+
+        jobs.push(newJob);
+
+        localStorage.setItem('jobs', JSON.stringify(jobs));
+
+        console.log('Informação Salva', jobs)
     }
 
     return (
