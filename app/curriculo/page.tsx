@@ -1,22 +1,32 @@
+'use client'
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { email, z } from 'zod'
+import { z } from 'zod';
+import { useForm, FormProvider } from 'react-hook-form'
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { BirthdayField } from "./birthdayPopover";
+import { Textarea } from "@/components/ui/textarea";
+import { ExperienceCard } from "./experienceCard";
+import { EducationCard } from "./educationCards";
+import { TagsField } from "./tagField";
+import { ProjectsCard } from "./projects";
+import { LanguagesCard } from "./languageCards";
+import { useEffect } from "react";
+
 
 const personalSchema = z.object({
     name: z.string().trim().min(1, {
         message: 'Nome é obrigatório!'
     }),
-    email: z.email({
-        message: 'E-mail é obrigatório!'
-    }),
+    email: z.string().min(1).pipe(z.email()),
     phoneNumber: z.string().min(1, {
         message: 'Telefone é obrigatório!'
     }),
-    birthday: z.date().min(1, {
-        message: 'Data de nascimento é obrigatório!'
-    }),
-    linkedin: z.url().optional(),
-    portifolio: z.url().optional()
+    birthday: z.coerce.date().optional(),
+    linkedin: z.string().url().optional().or(z.literal("")),
+    portifolio: z.string().url().optional().or(z.literal(""))
 })
 
 const resumeSchema = z.object({
@@ -52,6 +62,9 @@ const educationSchema = z.object({
     institutionName: z.string().min(3, {
         message: 'Digite o nome da instituição.'
     }),
+    title: z.string().min(1, {
+        message: 'digite o titulo da sua graduação'
+    }),
     start: z.object({
         month: z.string(),
         year: z.string(),
@@ -62,17 +75,15 @@ const educationSchema = z.object({
     }).optional(),
     description: z.string().min(1, {
         message: 'Descreva as atividades.'
-    }),
-    skills: z.array(z.string().trim().toLowerCase().min(1, "Habilidade inválida")
-    ).min(1, "Adicione pelo menos uma habilidade")
+    })
 });
 
 const skillSchema = z.object({
-    hardSkills: z.array(z.string().trim().toLowerCase().min(1, "Habilidade inválida")).min(1, "Adicione pelo menos uma habilidade")
+    skills: z.array(z.string()).min(1, "Adicione pelo menos uma habilidade"),
 })
 
 const toolSchema = z.object({
-    toolsSkills: z.array(z.string().trim().toLowerCase().min(1, "Ferranebta inválida")).min(1, "Adicione pelo menos uma ferramenta")
+    tools: z.array(z.string()).min(1, "Adicione pelo menos uma ferramenta"),
 })
 
 const projectSchema = z.object({
@@ -83,7 +94,6 @@ const projectSchema = z.object({
     projectDescription: z.string().min(1, {
         message: 'descreva o projeto em detalhes'
     }),
-    usedTecnologies: z.array(z.string().trim().toLowerCase().min(1, "Habilidade inválida")).min(1, "Adicione pelo menos uma habilidade")
 })
 
 const languageSchema = z.object({
@@ -100,13 +110,56 @@ const curriculumSchema = z.object({
     resume: resumeSchema,
     experience: z.array(experienceSchema),
     education: z.array(educationSchema),
-    skills: skillSchema,
-    tools: toolSchema,
+    skills: z.array(z.string()).min(1, "Adicione pelo menos uma habilidade"),
+    tools: z.array(z.string()).min(1, "Adicione pelo menos uma ferramenta"),
     projects: z.array(projectSchema),
     languages: z.array(languageSchema)
 })
 
+type CurriculumFormData = z.infer<typeof curriculumSchema>;
+
 export default function Curriculo() {
+
+
+    const onSubmit = (data: CurriculumFormData) => {
+        localStorage.setItem("curriculum", JSON.stringify(data));
+        console.log("SALVO", data);
+    };
+
+    const onError = (errors) => {
+        console.log("ERROS", errors);
+    };
+
+    const form = useForm<CurriculumFormData>({
+        resolver: zodResolver(curriculumSchema),
+        defaultValues: {
+            personalInfo: {
+                name: '',
+                email: "",
+                phoneNumber: "",
+                birthday: undefined,
+                linkedin: "",
+                portifolio: "",
+            },
+            resume: {
+                resume: "",
+            },
+            experience: [],
+            education: [],
+            skills: [],
+            tools: [],
+            projects: [],
+            languages: [],
+        },
+    })
+
+    useEffect(() => {
+        const saved = localStorage.getItem("curriculum");
+        if (saved) {
+            form.reset(JSON.parse(saved));
+        }
+    }, []);
+
     return (
         <section className="h-full w-300 m-auto py-16">
             <div className="flex justify-between items-end">
@@ -114,84 +167,122 @@ export default function Curriculo() {
                     <h1 className="text-3xl font-bold">Currículo Base</h1>
                     <p className="text-muted-foreground text-sm">Preencha as informações abaixo. Esse currículo será a base para gerarmos versões personalizadas.</p>
                 </div>
-
-                <Button>Salvar</Button>
             </div>
 
-            <div className="flex flex-col my-6 gap-8">
-                <Card >
-                    <CardHeader >
-                        <CardTitle className="text-xl font-bold uppercase ">Dados Pessoais</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-between">
+            <FormProvider {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit, onError)}>
+                    <div className="flex flex-col my-6 gap-8">
 
-                    </CardContent>
-                </Card>
-                <Card >
-                    <CardHeader >
-                        <CardTitle className="text-xl font-bold uppercase ">Resumo Profissional</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-between">
+                        <Card >
+                            <CardHeader >
+                                <CardTitle className="text-xl font-bold uppercase ">Dados Pessoais</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid grid-cols-2 gap-4">
 
-                    </CardContent>
-                </Card>
-                <Card >
-                    <CardHeader >
-                        <CardTitle className="text-xl font-bold uppercase ">Experiências Profissionais</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-between">
+                                <Field>
+                                    <FieldLabel className="font-medium text-muted-foreground text-xs">Nome*</FieldLabel>
+                                    <Input {...form.register('personalInfo.name')} />
+                                    <FieldError>
+                                        {form.formState.errors.personalInfo?.name?.message}
+                                    </FieldError>
+                                </Field>
 
-                    </CardContent>
-                </Card>
+                                <Field>
+                                    <FieldLabel className="font-medium text-muted-foreground text-xs">E-mail*</FieldLabel>
+                                    <Input {...form.register('personalInfo.email')} />
+                                    <FieldError>
+                                        {form.formState.errors.personalInfo?.email?.message}
+                                    </FieldError>
+                                </Field>
 
-                <Card >
-                    <CardHeader >
-                        <CardTitle className="text-xl font-bold uppercase ">Educação</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-between">
+                                <Field>
+                                    <FieldLabel className="font-medium text-muted-foreground text-xs">Telefone*</FieldLabel>
+                                    <Input {...form.register('personalInfo.phoneNumber')} />
+                                    <FieldError>
+                                        {form.formState.errors.personalInfo?.phoneNumber?.message}
+                                    </FieldError>
+                                </Field>
 
-                    </CardContent>
-                </Card>
+                                <Field>
+                                    <FieldLabel className="font-medium text-muted-foreground text-xs">Data de Nascimento*</FieldLabel>
+                                    <BirthdayField />
+                                    <FieldError>
+                                        {form.formState.errors.personalInfo?.birthday?.message}
+                                    </FieldError>
+                                </Field>
 
-                <div className="grid grid-cols-2 gap-8">
-                    <Card >
-                        <CardHeader >
-                            <CardTitle className="text-xl font-bold uppercase ">Habilidades Técnicas</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex justify-between">
+                                <Field>
+                                    <FieldLabel className="font-medium text-muted-foreground text-xs">LinkedIn*</FieldLabel>
+                                    <Input {...form.register('personalInfo.linkedin')} />
+                                    <FieldError>
+                                        {form.formState.errors.personalInfo?.linkedin?.message}
+                                    </FieldError>
+                                </Field>
 
-                        </CardContent>
-                    </Card>
+                                <Field>
+                                    <FieldLabel className="font-medium text-muted-foreground text-xs">Portifólio*</FieldLabel>
+                                    <Input {...form.register('personalInfo.portifolio')} />
+                                    <FieldError>
+                                        {form.formState.errors.personalInfo?.portifolio?.message}
+                                    </FieldError>
+                                </Field>
+                            </CardContent>
+                        </Card>
 
-                    <Card >
-                        <CardHeader >
-                            <CardTitle className="text-xl font-bold uppercase ">Ferramentas</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex justify-between">
+                        <Card >
+                            <CardHeader >
+                                <CardTitle className="text-xl font-bold uppercase ">Resumo Profissional</CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex justify-between">
+                                <Field>
+                                    <Textarea {...form.register("resume.resume")} />
+                                </Field>
+                            </CardContent>
+                        </Card>
 
-                        </CardContent>
-                    </Card>
-                </div>
+                        <ExperienceCard />
 
-                <Card >
-                    <CardHeader >
-                        <CardTitle className="text-xl font-bold uppercase ">Idiomas</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-between">
+                        <EducationCard />
 
-                    </CardContent>
-                </Card>
+                        <div className="grid grid-cols-2 gap-8">
+                            <Card >
+                                <CardHeader >
+                                    <CardTitle className="text-xl font-bold uppercase ">Habilidades Técnicas</CardTitle>
+                                </CardHeader>
+                                <CardContent className="w-full">
+                                    <TagsField
+                                        name="skills"
+                                        label="Habilidades Técnicas"
+                                        placeholder="Ex: React, docker..."
+                                    />
+                                </CardContent>
+                            </Card>
 
-                <Card >
-                    <CardHeader >
-                        <CardTitle className="text-xl font-bold uppercase ">Projetos</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-between">
+                            <Card >
+                                <CardHeader >
+                                    <CardTitle className="text-xl font-bold uppercase ">Ferramentas</CardTitle>
+                                </CardHeader>
+                                <CardContent className="w-full">
+                                    <TagsField
+                                        name="tools"
+                                        label="Ferramentas"
+                                        placeholder="Ex: figma, docker..."
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
 
-                    </CardContent>
-                </Card>
-            </div>
+                        <ProjectsCard />
 
+                        <LanguagesCard />
+
+                    </div>
+
+                    <Button type="submit">Salvar Currículo</Button>
+                </form>
+
+
+            </FormProvider>
 
         </section>
     )
