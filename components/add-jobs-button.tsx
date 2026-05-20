@@ -10,6 +10,8 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import { SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, Select } from "./ui/select";
 import { Textarea } from "./ui/textarea";
+import { createNewJob } from "@/app/actions/actions";
+
 
 const formSchema = z.object({
     title: z.string().trim().min(1, {
@@ -40,21 +42,32 @@ const AddJobsButton = () => {
         }
     })
 
-    const onSubmit = (data: FormSchema) => {
-        const newJob = {
-            ...data,
-            id: crypto.randomUUID(),
-            createdAt: new Date().toISOString()
+    const onSubmit = async (data: FormSchema) => {
+        // const newJob = {
+        //     ...data,
+        //     id: crypto.randomUUID(),
+        //     createdAt: new Date().toISOString()
+        // }
+
+        // const storedJobs = localStorage.getItem('jobs')
+        // const jobs = storedJobs ? JSON.parse(storedJobs) : []
+
+        // jobs.push(newJob);
+
+        // localStorage.setItem('jobs', JSON.stringify(jobs));
+
+        // console.log('Informação Salva', jobs)
+
+        try {
+            await createNewJob(data)
+
+            console.log('Vaga cadastrada com sucesso')
+
+            form.reset()
+
+        } catch (error) {
+            console.log(error)
         }
-
-        const storedJobs = localStorage.getItem('jobs')
-        const jobs = storedJobs ? JSON.parse(storedJobs) : []
-
-        jobs.push(newJob);
-
-        localStorage.setItem('jobs', JSON.stringify(jobs));
-
-        console.log('Informação Salva', jobs)
     }
 
     return (
@@ -127,16 +140,16 @@ const AddJobsButton = () => {
 
                         <Field>
                             <FieldLabel>Descrição da Vaga</FieldLabel>
-                                                            <Controller
-                                    name="jobDescription"
-                                    control={form.control}
-                                    render={({ field }) => (<Textarea {...field} placeholder="Adicione aqui a descrição completa da vaga" />)}
-                                />
+                            <Controller
+                                name="jobDescription"
+                                control={form.control}
+                                render={({ field }) => (<Textarea {...field} placeholder="Adicione aqui a descrição completa da vaga" />)}
+                            />
 
-                                <FieldError>
-                                    {form.formState.errors.jobDescription?.message}
-                                </FieldError>
-                            
+                            <FieldError>
+                                {form.formState.errors.jobDescription?.message}
+                            </FieldError>
+
                         </Field>
 
                         <Button type="submit">Cadastrar Vaga</Button>

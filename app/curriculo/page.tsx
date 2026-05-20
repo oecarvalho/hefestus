@@ -78,14 +78,6 @@ const educationSchema = z.object({
     })
 });
 
-const skillSchema = z.object({
-    skills: z.array(z.string()).min(1, "Adicione pelo menos uma habilidade"),
-})
-
-const toolSchema = z.object({
-    tools: z.array(z.string()).min(1, "Adicione pelo menos uma ferramenta"),
-})
-
 const projectSchema = z.object({
     projectName: z.string().trim().min(1, {
         message: 'digite o nome do projeto'
@@ -119,7 +111,6 @@ const curriculumSchema = z.object({
 type CurriculumFormData = z.infer<typeof curriculumSchema>;
 
 export default function Curriculo() {
-
 
     const onSubmit = (data: CurriculumFormData) => {
         localStorage.setItem("curriculum", JSON.stringify(data));
