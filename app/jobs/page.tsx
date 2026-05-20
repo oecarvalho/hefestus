@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { CardJobs } from "./components/card-job";
 import { prisma } from "@/lib/prisma";
+import AddJobsButton from "@/components/add-jobs-button";
 
 export default async function Jobs() {
 
@@ -17,7 +17,7 @@ export default async function Jobs() {
                     <p className="text-muted-foreground text-sm">Gerencie suas candidaturas, acompanhe o match com seu currículo e status de cada processo.</p>
                 </div>
 
-                <Button>Nova Vaga</Button>
+                <AddJobsButton/>
             </div>
             <div className="flex justify-between gap-5 mb-5">
                 <InputGroup className="max-w-full">
