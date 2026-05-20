@@ -3,8 +3,12 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { CardJobs } from "./components/card-job";
+import { prisma } from "@/lib/prisma";
 
-export default function Jobs() {
+export default async function Jobs() {
+
+    const jobs = await prisma.job.findMany()
+
     return (
         <section className="h-full w-300 m-auto py-16">
             <div className="flex justify-between items-end mb-7">
@@ -41,8 +45,13 @@ export default function Jobs() {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-
-            <CardJobs/>
+            
+            {jobs.map((job)=>(
+                <CardJobs
+                    key={job.id}
+                    job={job}
+                />
+            ))}
 
             </div>
         </section>

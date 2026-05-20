@@ -4,22 +4,33 @@ import { SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } fr
 import { Building2, ExternalLink, MapPin, Trash } from "lucide-react";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
-export function CardJobs() {
+
+interface CardJobsProps {
+    job: {
+        id: string
+        jobTitle: string
+        nameEnterprise: string
+        workModel: string
+    }
+}
+
+export function CardJobs({ job }: CardJobsProps) {
     return (
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-semibold truncate">Desenvolvedor Front-end</CardTitle>
+                <CardTitle className="font-semibold truncate">{job.jobTitle}</CardTitle>
                 <CardDescription className="flex gap-2">
                     <div className="flex gap-1 items-center">
                         <Building2 size={18} />
-                        O'boticário
+                        {job.nameEnterprise}
                     </div>
 
                     <div className="flex gap-1 items-center">
                         <MapPin size={18} />
-                        Remoto
+                        {job.workModel}
                     </div>
                 </CardDescription>
                 <CardAction className="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-zinc-100">
@@ -58,10 +69,12 @@ export function CardJobs() {
                     Excluir
                 </Button>
 
-                <Button>
-                    Detalhes
-                    <ExternalLink />
-                </Button>
+                <Link href={`/jobs/${job.id}`}>
+                    <Button>
+                        Detalhes
+                        <ExternalLink />
+                    </Button>
+                </Link>
             </CardFooter>
         </Card>
     )
