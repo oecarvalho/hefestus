@@ -35,7 +35,6 @@ export default async function Jobs() {
                         <SelectGroup>
                             <SelectLabel>Status da vaga</SelectLabel>
                             <SelectItem value="aplicado">Aplicado</SelectItem>
-                            <SelectItem value="analise">Em Analise</SelectItem>
                             <SelectItem value="andamento">Em Andamento</SelectItem>
                             <SelectItem value="rejeitado">Rejeitado</SelectItem>
                             <SelectItem value="cancelado">Cancelada</SelectItem>

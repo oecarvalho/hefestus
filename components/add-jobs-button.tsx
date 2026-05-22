@@ -32,6 +32,8 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>
 
 const AddJobsButton = () => {
+
+
     const form = useForm<FormSchema>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -82,7 +84,7 @@ const AddJobsButton = () => {
                     <DialogDescription>Preencha as informações com atenção para o Hefestus te ajudar.</DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form className="overflow-y-auto max-h-[75vh] pr-2" onSubmit={form.handleSubmit(onSubmit)}>
                     <FieldGroup>
                         <Field>
                             <FieldLabel>Titulo da Vaga</FieldLabel>
@@ -117,7 +119,7 @@ const AddJobsButton = () => {
                                     name="workModel"
                                     control={form.control}
                                     render={({ field }) => (
-                                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                        <Select value={field.value} onValueChange={field.onChange}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Selecione" />
                                             </SelectTrigger>
@@ -143,7 +145,7 @@ const AddJobsButton = () => {
                             <Controller
                                 name="jobDescription"
                                 control={form.control}
-                                render={({ field }) => (<Textarea {...field} placeholder="Adicione aqui a descrição completa da vaga" />)}
+                                render={({ field }) => (<Textarea className="w-full max-w-full break-words whitespace-pre-wrap overflow-x-hidden" {...field} placeholder="Adicione aqui a descrição completa da vaga" />)}
                             />
 
                             <FieldError>

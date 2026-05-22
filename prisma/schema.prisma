@@ -14,7 +14,8 @@ model Job {
   workModel String
   description String
   date DateTime @default(now())
-
+  status String @default("aplicado")
+  
   @@map("job")
 }
 
