@@ -1,3 +1,4 @@
+import { generateResumePdf } from "@/app/actions/generate-resume"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,6 +7,7 @@ import { prisma } from "@/lib/prisma"
 import { ArrowLeft, Building2, MapPin, WandSparkles } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { GenerateResumeButton } from "../components/generate-resume-button"
 
 interface JobPageProps {
   params: Promise<{
@@ -42,6 +44,16 @@ export default async function JobPage({ params }: JobPageProps) {
     ]
   });
 
+  const handleGenerateResume = async () => {
+
+    const result = await generateResumePdf(
+      job.id,
+      "123"
+    );
+
+    console.log(result);
+  }
+
   return (
     <section className="h-full w-300 m-auto py-16">
 
@@ -64,10 +76,7 @@ export default async function JobPage({ params }: JobPageProps) {
 
         </div>
 
-        <Button>
-          <WandSparkles />
-          Gerar Currículo com IA
-        </Button>
+        <GenerateResumeButton jobId={job.id} userId="123"/>
       </div>
 
       <div className="grid grid-cols-[2fr_1fr] gap-4">

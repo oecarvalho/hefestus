@@ -84,7 +84,7 @@ export function GraficoAplicacoes({ jobs }: GraficoAplicacoesProps) {
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value)
-                return date.toLocaleDateString("en-US", {
+                return date.toLocaleDateString("pt-BR", {
                   month: "short",
                   day: "numeric",
                 })
@@ -96,7 +96,7 @@ export function GraficoAplicacoes({ jobs }: GraficoAplicacoesProps) {
                   className="w-[150px]"
                   nameKey="views"
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
+                    return new Date(value).toLocaleDateString("pt-BR", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
