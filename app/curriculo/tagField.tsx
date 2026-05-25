@@ -2,7 +2,7 @@
 
 import { Controller, useFormContext } from "react-hook-form";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { TagsInput } from "./visualTags";
+import { TagsInput } from "./components/visualTags";
 
 type TagsFieldProps = {
   name: string;

@@ -23,6 +23,15 @@ export async function extractSkills(
         - DevOps
         - ferramentas
         - tecnologias
+        - Padrões de projeto (SOLID, TDD, BDD)
+        - Boas práticas (Clean Code)
+        - Metodologias Ageis
+
+        Obs: Se a vaga pedir HTML5, CSS3 ou alguma tecnologia com versão especifica, considerar somente a tecnologia, por exemplo:
+        - HTML5 = HTML
+        - CSS3 = CSS
+        - JAVA 15 = JAVA
+        - REST API OU API RESTFUL = REST
 
         Retorne SOMENTE um JSON válido.
 

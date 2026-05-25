@@ -2,8 +2,12 @@ import AddJobsButton from "@/components/add-jobs-button";
 import { GraficoAplicacoes } from "@/components/chart/chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, CheckCheck, CircleX, TrendingUp } from "lucide-react";
+import { getDashboardMetrics } from "@/app/actions/dashboard-actions";
 
-export default function Home() {
+export default async function Home() {
+
+  const metrics = await getDashboardMetrics();
+
   return (
     <section className="h-full w-300 m-auto py-16">
       <div className="flex justify-between items-end">
@@ -21,7 +25,7 @@ export default function Home() {
             <CardTitle className="text-xs uppercase text-muted-foreground">Total de Vagas</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-between">
-            <span className="text-4xl font-bold text-blue-400">2</span>
+            <span className="text-4xl font-bold text-blue-400">{metrics.totalJobs}</span>
             <Briefcase size={40} className="text-blue-400" />
           </CardContent>
         </Card>
@@ -31,7 +35,7 @@ export default function Home() {
             <CardTitle className="text-xs uppercase text-muted-foreground">Em andamento</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-between">
-            <span className="text-4xl font-bold text-green-400">1</span>
+            <span className="text-4xl font-bold text-green-400">{metrics.andamento}</span>
             <TrendingUp size={40} className="text-green-400" />
           </CardContent>
         </Card>
@@ -41,7 +45,7 @@ export default function Home() {
             <CardTitle className="text-xs uppercase text-muted-foreground">Rejeitadas</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-between">
-            <span className="text-4xl font-bold text-red-400">0</span>
+            <span className="text-4xl font-bold text-red-400">{metrics.rejeitadas}</span>
             <CircleX size={40} className="text-red-400" />
           </CardContent>
         </Card>
@@ -51,13 +55,13 @@ export default function Home() {
             <CardTitle className="text-xs uppercase text-muted-foreground">Match Médio</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-between">
-            <span className="text-4xl font-bold text-orange-400">20%</span>
+            <span className="text-4xl font-bold text-orange-400">{metrics.averageMatch}%</span>
             <CheckCheck size={40} className="text-orange-400" />
           </CardContent>
         </Card>
       </div>
 
-      <GraficoAplicacoes/>
+      <GraficoAplicacoes jobs={metrics.jobs}/>
     </section>
   );
 }

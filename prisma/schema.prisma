@@ -23,7 +23,8 @@ model Job {
 
 model Curriculum{
   id String @id @default(cuid())
-
+  userId String @unique
+  
   name String
   email String
   phoneNumber String

@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { deleteNewJob, updateJobStatus } from "@/app/actions/actions";
 import { toast } from "sonner";
 import { useState, useTransition } from "react";
+import { getDaysAgo } from "@/lib/get-days";
 
 interface CardJobsProps {
     job: {
@@ -19,6 +20,7 @@ interface CardJobsProps {
         nameEnterprise: string
         workModel: string
         status: string
+        date: string | Date
     }
 
     match: {
@@ -112,7 +114,7 @@ export function CardJobs({ job, match }: CardJobsProps) {
 
 
 
-                <Badge> 27d sem atualização</Badge>
+                <Badge> {getDaysAgo(job.date)}</Badge>
             </CardContent>
             <CardFooter className="flex items-center justify-between pt-2 border-t">
 
