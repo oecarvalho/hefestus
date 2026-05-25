@@ -1,10 +1,10 @@
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Search } from "lucide-react";
+
 import { CardJobs } from "./components/card-job";
 import { prisma } from "@/lib/prisma";
 import AddJobsButton from "@/components/add-jobs-button";
 import JobsFilter from "./components/jobs-filter";
 import JobsSearch from "./components/job-search";
+import { calculateMatch } from "@/lib/match";
 
 interface JobsPageProps {
     searchParams: Promise<{
@@ -48,6 +48,29 @@ export default async function Jobs({ searchParams }: JobsPageProps) {
         }
     })
 
+    const curriculum = await prisma.curriculum.findFirst();
+
+    const jobsWithMatch = jobs.map((job) => {
+
+        const match = calculateMatch({
+
+            jobSkills:
+                (job.extractedSkills as string[]) ?? [],
+
+            curriculumSkills: [
+
+                ...(curriculum?.skills ?? []),
+
+                ...(curriculum?.tools ?? [])
+            ]
+        });
+
+        return {
+            ...job,
+            match
+        };
+    });
+
     return (
         <section className="h-full w-300 m-auto py-16">
             <div className="flex justify-between items-end mb-7">
@@ -59,16 +82,17 @@ export default async function Jobs({ searchParams }: JobsPageProps) {
                 <AddJobsButton />
             </div>
             <div className="flex justify-between gap-5 mb-5">
-                <JobsSearch/>
+                <JobsSearch />
                 <JobsFilter />
             </div>
 
             <div className="grid grid-cols-3 gap-4">
 
-                {jobs.map((job) => (
+                {jobsWithMatch.map((job) => (
                     <CardJobs
                         key={job.id}
                         job={job}
+                        match={job.match}
                     />
                 ))}
 

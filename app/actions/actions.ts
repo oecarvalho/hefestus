@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { extractSkills } from '@/lib/extract-skills'
 
 interface CreateNewJobProps {
   title: string
@@ -12,12 +13,18 @@ interface CreateNewJobProps {
 }
 
 export async function createNewJob(data: CreateNewJobProps) {
+
+  const skills = await extractSkills(
+    data.jobDescription
+  );
+
   await prisma.job.create({
     data: {
       jobTitle: data.title,
       nameEnterprise: data.nameEnterprise,
       workModel: data.workModel,
       description: data.jobDescription,
+      extractedSkills: skills
     },
   })
 

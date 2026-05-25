@@ -16,6 +16,8 @@ model Job {
   date DateTime @default(now())
   status String @default("aplicado")
   
+  extractedSkills Json?
+
   @@map("job")
 }
 

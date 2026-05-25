@@ -14,7 +14,7 @@ import { TagsField } from "./tagField";
 import { ProjectsCard } from "./projects";
 import { LanguagesCard } from "./languageCards";
 import { useEffect } from "react";
-
+import { saveCurriculum } from "@/app/actions/curriculum-actions";
 
 const personalSchema = z.object({
     name: z.string().trim().min(1, {
@@ -112,8 +112,8 @@ type CurriculumFormData = z.infer<typeof curriculumSchema>;
 
 export default function Curriculo() {
 
-    const onSubmit = (data: CurriculumFormData) => {
-        localStorage.setItem("curriculum", JSON.stringify(data));
+    const onSubmit = async (data: CurriculumFormData) => {
+        await saveCurriculum(data);
         console.log("SALVO", data);
     };
 

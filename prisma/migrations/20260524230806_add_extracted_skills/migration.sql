@@ -1,13 +1,15 @@
 -- CreateTable
-CREATE TABLE "newjob" (
+CREATE TABLE "job" (
     "id" TEXT NOT NULL,
     "jobTitle" TEXT NOT NULL,
     "nameEnterprise" TEXT NOT NULL,
     "workModel" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "scheduleAt" TIMESTAMP(3) NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "status" TEXT NOT NULL DEFAULT 'aplicado',
+    "extractedSkills" JSONB,
 
-    CONSTRAINT "newjob_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "job_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable

@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { calculateMatch } from "@/lib/match"
 import { prisma } from "@/lib/prisma"
 import { ArrowLeft, Building2, MapPin, WandSparkles } from "lucide-react"
 import Link from "next/link"
@@ -25,6 +26,21 @@ export default async function JobPage({ params }: JobPageProps) {
   if (!job) {
     return notFound()
   }
+
+  const curriculum = await prisma.curriculum.findFirst();
+
+  const match = calculateMatch({
+
+    jobSkills:
+      (job?.extractedSkills as string[]) ?? [],
+
+    curriculumSkills: [
+
+      ...(curriculum?.skills ?? []),
+
+      ...(curriculum?.tools ?? [])
+    ]
+  });
 
   return (
     <section className="h-full w-300 m-auto py-16">
@@ -73,21 +89,18 @@ export default async function JobPage({ params }: JobPageProps) {
               <CardTitle>Match da Vaga</CardTitle>
             </CardHeader>
             <CardContent>
-              27%
+              {match.matchScore}%
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Skills Compatíveis (4)</CardTitle>
+              <CardTitle>Skills Compatíveis</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center gap-2 flex-wrap">
-              <Badge>JavaScript</Badge>
-              <Badge>React</Badge>
-              <Badge>GitHub</Badge>
-              <Badge>TailwindCSS</Badge>
-              <Badge>Node</Badge>
-              <Badge>HTML5</Badge>
+              {match.matchingSkills.map((skill) => (
+                <Badge key={skill}>{skill}</Badge>
+              ))}
             </CardContent>
           </Card>
 
@@ -96,12 +109,9 @@ export default async function JobPage({ params }: JobPageProps) {
               <CardTitle>Skills Faltantes</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center gap-2 flex-wrap">
-              <Badge>JavaScript</Badge>
-              <Badge>React</Badge>
-              <Badge>GitHub</Badge>
-              <Badge>TailwindCSS</Badge>
-              <Badge>Node</Badge>
-              <Badge>HTML5</Badge>
+              {match.missingSkills.map((skill) => (
+                <Badge variant='destructive' key={skill}>{skill}</Badge>
+              ))}
             </CardContent>
           </Card>
         </div>

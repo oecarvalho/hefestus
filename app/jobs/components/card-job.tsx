@@ -20,9 +20,15 @@ interface CardJobsProps {
         workModel: string
         status: string
     }
+
+    match: {
+        matchScore: number
+        matchingSkills: string[]
+        missingSkills: string[]
+    }
 }
 
-export function CardJobs({ job }: CardJobsProps) {
+export function CardJobs({ job, match }: CardJobsProps) {
     const [status, setStatus] = useState(job.status ?? "aplicado");
     const [isPending, startTransition] = useTransition();
 
@@ -81,7 +87,7 @@ export function CardJobs({ job }: CardJobsProps) {
                 </CardDescription>
                 <CardAction className="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-zinc-100">
                     <span className="text-lg font-bold leading-none text-red-400">
-                        27%
+                       {match.matchScore}%
                     </span>
 
                     <span className="text-[10px] font-medium text-zinc-400">
