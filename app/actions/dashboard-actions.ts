@@ -3,10 +3,11 @@
 import { prisma } from "@/lib/prisma";
 import { calculeMatch } from "./calcule-match";
 
-export async function getDashboardMetrics() {
+type Job = {
+    status: string;
+}
 
-    // TEMPORÁRIO
-    // depois trocar pela sessão/autenticação
+export async function getDashboardMetrics() {
 
     const userId = "123";
 
@@ -39,7 +40,7 @@ export async function getDashboardMetrics() {
     const totalJobs = jobs.length;
 
     const andamento = jobs.filter(
-        job => job.status === "andamento"
+        (job: Job) => job.status === "andamento"
     ).length;
 
     const rejeitadas = jobs.filter(
