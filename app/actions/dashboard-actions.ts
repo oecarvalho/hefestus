@@ -3,30 +3,24 @@
 import { prisma } from "@/lib/prisma";
 import { calculeMatch } from "./calcule-match";
 
-type Job = {
-    status: string;
-}
-
 export async function getDashboardMetrics() {
 
     const userId = "123";
 
     const curriculum = await prisma.curriculum.findUnique({
-
         where: {
-            userId
+            userId,
         },
 
         select: {
             skills: true,
             tools: true,
-        }
+        },
     });
 
     const jobs = await prisma.job.findMany({
-
         orderBy: {
-            date: "desc"
+            date: "desc",
         },
 
         select: {
@@ -34,17 +28,17 @@ export async function getDashboardMetrics() {
             status: true,
             extractedSkills: true,
             date: true,
-        }
+        },
     });
 
     const totalJobs = jobs.length;
 
     const andamento = jobs.filter(
-        (job: Job) => job.status === "andamento"
+        (job) => job.status === "andamento"
     ).length;
 
     const rejeitadas = jobs.filter(
-       (job: Job) => job.status === "rejeitado"
+        (job) => job.status === "rejeitado"
     ).length;
 
     const userSkills = [
@@ -55,7 +49,7 @@ export async function getDashboardMetrics() {
     const matches = jobs.map((job) => {
 
         const jobSkills = Array.isArray(job.extractedSkills)
-            ? job.extractedSkills as string[]
+            ? (job.extractedSkills as string[])
             : [];
 
         const match = calculeMatch({
