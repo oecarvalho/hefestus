@@ -45,12 +45,16 @@ export async function generateResumePdf(
     job,
   });
 
-  // remove markdown
-  const cleanedResponse = aiResponse
-    .replace(/```json/g, "")
-    .replace(/```/g, "")
-    .trim();
+ if (!aiResponse) {
+  throw new Error("Resposta da IA não foi gerada.");
+}
 
+const cleanedResponse = aiResponse
+  .replace(/```json/g, "")
+  .replace(/```/g, "")
+  .trim();
+
+  
   // converte para objeto
   const parsedData = JSON.parse(cleanedResponse);
 

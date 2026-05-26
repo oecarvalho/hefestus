@@ -8,8 +8,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 
+type ProjectsForm = {
+  projects: {
+    projectName: string;
+    projectLink: string;
+    projectDescription: string;
+  }[];
+};
+
 export function ProjectsCard() {
-  const { control, register, formState } = useFormContext();
+
+  const {
+    control,
+    register,
+    formState,
+  } = useFormContext<ProjectsForm>();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -34,7 +47,8 @@ export function ProjectsCard() {
               })
             }
           >
-            <Plus /> Adicionar
+            <Plus />
+            Adicionar
           </Button>
         </div>
       </CardHeader>
@@ -47,13 +61,15 @@ export function ProjectsCard() {
               {/* NOME */}
               <Field>
                 <FieldLabel>Nome do Projeto</FieldLabel>
+
                 <Input
                   {...register(`projects.${index}.projectName`)}
                 />
+
                 <FieldError>
                   {
-                    formState.errors.projects?.[index]?.projectName
-                      ?.message
+                    formState.errors.projects?.[index]
+                      ?.projectName?.message
                   }
                 </FieldError>
               </Field>
@@ -61,13 +77,15 @@ export function ProjectsCard() {
               {/* LINK */}
               <Field>
                 <FieldLabel>Link</FieldLabel>
+
                 <Input
                   {...register(`projects.${index}.projectLink`)}
                 />
+
                 <FieldError>
                   {
-                    formState.errors.projects?.[index]?.projectLink
-                      ?.message
+                    formState.errors.projects?.[index]
+                      ?.projectLink?.message
                   }
                 </FieldError>
               </Field>
@@ -75,9 +93,13 @@ export function ProjectsCard() {
               {/* DESCRIÇÃO */}
               <Field className="col-span-2">
                 <FieldLabel>Descrição</FieldLabel>
+
                 <Textarea
-                  {...register(`projects.${index}.projectDescription`)}
+                  {...register(
+                    `projects.${index}.projectDescription`
+                  )}
                 />
+
                 <FieldError>
                   {
                     formState.errors.projects?.[index]

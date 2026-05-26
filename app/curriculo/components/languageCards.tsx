@@ -7,8 +7,20 @@ import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 
+type LanguagesForm = {
+  languages: {
+    language: string;
+    level: string;
+  }[];
+};
+
 export function LanguagesCard() {
-  const { control, register, formState } = useFormContext();
+
+  const {
+    control,
+    register,
+    formState,
+  } = useFormContext<LanguagesForm>();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -32,7 +44,8 @@ export function LanguagesCard() {
               })
             }
           >
-            <Plus /> Adicionar
+            <Plus />
+            Adicionar
           </Button>
         </div>
       </CardHeader>
@@ -45,13 +58,15 @@ export function LanguagesCard() {
               {/* IDIOMA */}
               <Field>
                 <FieldLabel>Idioma</FieldLabel>
+
                 <Input
                   {...register(`languages.${index}.language`)}
                 />
+
                 <FieldError>
                   {
-                    formState.errors.languages?.[index]?.language
-                      ?.message
+                    formState.errors.languages?.[index]
+                      ?.language?.message
                   }
                 </FieldError>
               </Field>
@@ -59,14 +74,16 @@ export function LanguagesCard() {
               {/* NÍVEL */}
               <Field>
                 <FieldLabel>Nível</FieldLabel>
+
                 <Input
                   placeholder="Ex: Básico, Intermediário, Avançado"
                   {...register(`languages.${index}.level`)}
                 />
+
                 <FieldError>
                   {
-                    formState.errors.languages?.[index]?.level
-                      ?.message
+                    formState.errors.languages?.[index]
+                      ?.level?.message
                   }
                 </FieldError>
               </Field>

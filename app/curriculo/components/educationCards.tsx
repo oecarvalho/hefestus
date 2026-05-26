@@ -1,12 +1,50 @@
 "use client";
 
-import { useFormContext, useFieldArray } from "react-hook-form";
+import {
+    useFormContext,
+    useFieldArray,
+} from "react-hook-form";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+
+import {
+    Field,
+    FieldLabel,
+    FieldError,
+} from "@/components/ui/field";
+
 import { Input } from "@/components/ui/input";
+
 import { Textarea } from "@/components/ui/textarea";
+
 import { Plus } from "lucide-react";
+
+type CurriculumFormData = {
+    education: {
+        institutionName: string;
+
+        title: string;
+
+        start: {
+            month: string;
+            year: string;
+        };
+
+        end?: {
+            month: string;
+            year: string;
+        };
+
+        description: string;
+    }[];
+};
 
 const months = [
     { label: "Jan", value: "01" },
@@ -25,11 +63,17 @@ const months = [
 
 const years = Array.from({ length: 50 }, (_, i) => {
     const year = new Date().getFullYear() - i;
+
     return year.toString();
 });
 
 export function EducationCard() {
-    const { control, register, formState, setValue, watch } = useFormContext();
+
+    const {
+        control,
+        register,
+        formState,
+    } = useFormContext<CurriculumFormData>();
 
     const {
         fields,
@@ -42,8 +86,10 @@ export function EducationCard() {
 
     return (
         <Card>
+
             <CardHeader>
                 <div className="flex justify-between items-center">
+
                     <CardTitle className="text-xl font-bold uppercase">
                         Educação
                     </CardTitle>
@@ -54,29 +100,47 @@ export function EducationCard() {
                             append({
                                 institutionName: "",
                                 title: "",
-                                start: { month: "", year: "" },
-                                end: { month: "", year: "" },
+
+                                start: {
+                                    month: "",
+                                    year: "",
+                                },
+
+                                end: {
+                                    month: "",
+                                    year: "",
+                                },
+
                                 description: "",
-                                skills: [],
                             })
                         }
                     >
-                        <Plus /> Adicionar
+                        <Plus />
+                        Adicionar
                     </Button>
+
                 </div>
             </CardHeader>
 
             <CardContent className="space-y-4">
+
                 {fields.map((field, index) => (
+
                     <Card key={field.id}>
+
                         <CardContent className="grid grid-cols-2 gap-4">
 
-                            {/* INSTITUIÇÃO */}
                             <Field>
-                                <FieldLabel>Instituição</FieldLabel>
+                                <FieldLabel>
+                                    Instituição
+                                </FieldLabel>
+
                                 <Input
-                                    {...register(`education.${index}.institutionName`)}
+                                    {...register(
+                                        `education.${index}.institutionName` as const
+                                    )}
                                 />
+
                                 <FieldError>
                                     {
                                         formState.errors.education?.[index]
@@ -85,12 +149,17 @@ export function EducationCard() {
                                 </FieldError>
                             </Field>
 
-                            {/* CURSO */}
                             <Field>
-                                <FieldLabel>Curso / Formação</FieldLabel>
+                                <FieldLabel>
+                                    Curso / Formação
+                                </FieldLabel>
+
                                 <Input
-                                    {...register(`education.${index}.title`)}
+                                    {...register(
+                                        `education.${index}.title` as const
+                                    )}
                                 />
+
                                 <FieldError>
                                     {
                                         formState.errors.education?.[index]
@@ -99,89 +168,133 @@ export function EducationCard() {
                                 </FieldError>
                             </Field>
 
-                            {/* DATAS */}
                             <div className="col-span-2 grid grid-cols-2 gap-4">
 
-                                {/* INÍCIO */}
                                 <Field>
-                                    <FieldLabel>Início</FieldLabel>
+                                    <FieldLabel>
+                                        Início
+                                    </FieldLabel>
 
                                     <div className="flex gap-2">
+
                                         <select
-                                            {...register(`education.${index}.start.month`)}
+                                            {...register(
+                                                `education.${index}.start.month` as const
+                                            )}
                                             className="border rounded p-2 w-full"
                                         >
-                                            <option value="">Mês</option>
+                                            <option value="">
+                                                Mês
+                                            </option>
+
                                             {months.map((m) => (
-                                                <option key={m.value} value={m.value}>
+                                                <option
+                                                    key={m.value}
+                                                    value={m.value}
+                                                >
                                                     {m.label}
                                                 </option>
                                             ))}
                                         </select>
 
                                         <select
-                                            {...register(`education.${index}.start.year`)}
+                                            {...register(
+                                                `education.${index}.start.year` as const
+                                            )}
                                             className="border rounded p-2 w-full"
                                         >
-                                            <option value="">Ano</option>
+                                            <option value="">
+                                                Ano
+                                            </option>
+
                                             {years.map((y) => (
-                                                <option key={y} value={y}>
+                                                <option
+                                                    key={y}
+                                                    value={y}
+                                                >
                                                     {y}
                                                 </option>
                                             ))}
                                         </select>
+
                                     </div>
                                 </Field>
 
-                                {/* FIM */}
                                 <Field>
-                                    <FieldLabel>Fim</FieldLabel>
+                                    <FieldLabel>
+                                        Fim
+                                    </FieldLabel>
 
                                     <div className="flex gap-2">
+
                                         <select
-                                            {...register(`education.${index}.end.month`)}
+                                            {...register(
+                                                `education.${index}.end.month` as const
+                                            )}
                                             className="border rounded p-2 w-full"
                                         >
-                                            <option value="">Mês</option>
+                                            <option value="">
+                                                Mês
+                                            </option>
+
                                             {months.map((m) => (
-                                                <option key={m.value} value={m.value}>
+                                                <option
+                                                    key={m.value}
+                                                    value={m.value}
+                                                >
                                                     {m.label}
                                                 </option>
                                             ))}
                                         </select>
 
                                         <select
-                                            {...register(`education.${index}.end.year`)}
+                                            {...register(
+                                                `education.${index}.end.year` as const
+                                            )}
                                             className="border rounded p-2 w-full"
                                         >
-                                            <option value="">Ano</option>
+                                            <option value="">
+                                                Ano
+                                            </option>
+
                                             {years.map((y) => (
-                                                <option key={y} value={y}>
+                                                <option
+                                                    key={y}
+                                                    value={y}
+                                                >
                                                     {y}
                                                 </option>
                                             ))}
                                         </select>
+
                                     </div>
                                 </Field>
 
                             </div>
 
-                            {/* DESCRIÇÃO */}
                             <Field className="col-span-2">
-                                <FieldLabel>Descrição</FieldLabel>
+
+                                <FieldLabel>
+                                    Descrição
+                                </FieldLabel>
+
                                 <Textarea
-                                    {...register(`education.${index}.description`)}
+                                    {...register(
+                                        `education.${index}.description` as const
+                                    )}
                                 />
+
                                 <FieldError>
                                     {
                                         formState.errors.education?.[index]
                                             ?.description?.message
                                     }
                                 </FieldError>
+
                             </Field>
 
-                            {/* REMOVER */}
                             <div className="col-span-2 flex justify-end">
+
                                 <Button
                                     type="button"
                                     variant="destructive"
@@ -189,12 +302,16 @@ export function EducationCard() {
                                 >
                                     Remover
                                 </Button>
+
                             </div>
 
                         </CardContent>
+
                     </Card>
                 ))}
+
             </CardContent>
+
         </Card>
     );
 }

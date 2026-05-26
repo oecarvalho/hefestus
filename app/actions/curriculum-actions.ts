@@ -3,26 +3,72 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+interface Experience {
+  enterpriseName: string;
+  job: string;
+
+  jobStart: {
+    month: string;
+    year: string;
+  };
+
+  jobEnd?: {
+    month: string;
+    year: string;
+  };
+
+  jobDescription: string;
+  jobLocalization: string;
+}
+
+interface Education {
+  institutionName: string;
+  title: string;
+
+  start: {
+    month: string;
+    year: string;
+  };
+
+  end?: {
+    month: string;
+    year: string;
+  };
+
+  description: string;
+}
+
+interface Project {
+  projectName: string;
+  projectLink: string;
+  projectDescription: string;
+}
+
+interface Language {
+  language: string;
+  level: string;
+}
+
 interface SaveCurriculumProps {
   personalInfo: {
-    name: string
-    email: string
-    phoneNumber: string
-    birthday?: Date
-    linkedin?: string
-    portifolio?: string
-  }
+    name: string;
+    email: string;
+    phoneNumber: string;
+    birthday?: Date;
+    linkedin?: string;
+    portifolio?: string;
+  };
 
   resume: {
-    resume: string
-  }
+    resume: string;
+  };
 
-  experience: any[]
-  education: any[]
-  skills: string[]
-  tools: string[]
-  projects: any[]
-  languages: any[]
+  experience: Experience[];
+  education: Education[];
+  skills: string[];
+  tools: string[];
+  projects: Project[];
+  languages: Language[];
 }
 
 export async function saveCurriculum(
@@ -30,15 +76,22 @@ export async function saveCurriculum(
   data: SaveCurriculumProps
 ) {
 
-  const curriculumData = {
-
+  const curriculumData: {
+    name: string
+    email: string
+    phoneNumber: string
+    linkedin: string
+    portfolio: string
+    resume: string
+    skills: string[]
+    tools: string[]
+    birthday?: Date
+  } = {
     name: data.personalInfo.name,
 
     email: data.personalInfo.email,
 
     phoneNumber: data.personalInfo.phoneNumber,
-
-    birthday: data.personalInfo.birthday,
 
     linkedin: data.personalInfo.linkedin || "",
 
@@ -49,9 +102,13 @@ export async function saveCurriculum(
     skills: data.skills,
 
     tools: data.tools,
+  };
+
+  if (data.personalInfo.birthday instanceof Date) {
+    curriculumData.birthday = data.personalInfo.birthday;
   }
 
-  const experiencesData = data.experience.map(exp => ({
+  const experiencesData = data.experience.map((exp: Experience) => ({
     enterpriseName: exp.enterpriseName,
 
     job: exp.job,
@@ -60,16 +117,16 @@ export async function saveCurriculum(
 
     startYear: exp.jobStart.year,
 
-    endMonth: exp.jobEnd?.month,
+    endMonth: exp.jobEnd?.month || null,
 
-    endYear: exp.jobEnd?.year,
+    endYear: exp.jobEnd?.year || null,
 
     jobDescription: exp.jobDescription,
 
-    jobLocalization: exp.jobLocalization
-  }))
+    jobLocalization: exp.jobLocalization,
+  }));
 
-  const educationsData = data.education.map(edu => ({
+  const educationsData = data.education.map((edu: Education) => ({
     institutionName: edu.institutionName,
 
     title: edu.title,
@@ -78,31 +135,31 @@ export async function saveCurriculum(
 
     startYear: edu.start.year,
 
-    endMonth: edu.end?.month,
+    endMonth: edu.end?.month || null,
 
-    endYear: edu.end?.year,
+    endYear: edu.end?.year || null,
 
-    description: edu.description
-  }))
+    description: edu.description,
+  }));
 
-  const projectsData = data.projects.map(project => ({
+  const projectsData = data.projects.map((project: Project) => ({
     projectName: project.projectName,
 
     projectLink: project.projectLink,
 
-    projectDescription: project.projectDescription
-  }))
+    projectDescription: project.projectDescription,
+  }));
 
-  const languagesData = data.languages.map(language => ({
+  const languagesData = data.languages.map((language: Language) => ({
     language: language.language,
 
-    level: language.level
-  }))
+    level: language.level,
+  }));
 
   await prisma.curriculum.upsert({
 
     where: {
-      userId
+      userId,
     },
 
     update: {
@@ -113,29 +170,29 @@ export async function saveCurriculum(
 
         deleteMany: {},
 
-        create: experiencesData
+        create: experiencesData,
       },
 
       educations: {
 
         deleteMany: {},
 
-        create: educationsData
+        create: educationsData,
       },
 
       projects: {
 
         deleteMany: {},
 
-        create: projectsData
+        create: projectsData,
       },
 
       languages: {
 
         deleteMany: {},
 
-        create: languagesData
-      }
+        create: languagesData,
+      },
     },
 
     create: {
@@ -145,39 +202,39 @@ export async function saveCurriculum(
       ...curriculumData,
 
       experiences: {
-        create: experiencesData
+        create: experiencesData,
       },
 
       educations: {
-        create: educationsData
+        create: educationsData,
       },
 
       projects: {
-        create: projectsData
+        create: projectsData,
       },
 
       languages: {
-        create: languagesData
-      }
-    }
-  })
+        create: languagesData,
+      },
+    },
+  });
 
-  revalidatePath('/curriculo')
+  revalidatePath('/curriculo');
 }
 
 export async function getCurriculum(userId: string) {
 
-    return prisma.curriculum.findUnique({
+  return prisma.curriculum.findUnique({
 
-        where: {
-            userId
-        },
+    where: {
+      userId,
+    },
 
-        include: {
-            experiences: true,
-            educations: true,
-            projects: true,
-            languages: true,
-        }
-    })
+    include: {
+      experiences: true,
+      educations: true,
+      projects: true,
+      languages: true,
+    },
+  });
 }

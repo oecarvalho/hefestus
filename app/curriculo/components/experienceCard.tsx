@@ -28,8 +28,33 @@ const years = Array.from({ length: 50 }, (_, i) => {
     return year.toString();
 });
 
+type ExperienceForm = {
+    experience: {
+        enterpriseName: string;
+        job: string;
+
+        jobStart: {
+            month: string;
+            year: string;
+        };
+
+        jobEnd?: {
+            month: string;
+            year: string;
+        };
+
+        jobDescription: string;
+        jobLocalization: string;
+    }[];
+};
+
 export function ExperienceCard() {
-    const { control, register, formState } = useFormContext();
+
+    const {
+        control,
+        register,
+        formState,
+    } = useFormContext<ExperienceForm>();
 
     const { fields, append, remove } = useFieldArray({
         control,
@@ -40,7 +65,9 @@ export function ExperienceCard() {
         <Card>
             <CardHeader>
                 <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl font-bold uppercase">Experiências Profissionais</CardTitle>
+                    <CardTitle className="text-xl font-bold uppercase">
+                        Experiências Profissionais
+                    </CardTitle>
 
                     <Button
                         type="button"
@@ -48,14 +75,21 @@ export function ExperienceCard() {
                             append({
                                 enterpriseName: "",
                                 job: "",
-                                jobStart: { month: "", year: "" },
-                                jobEnd: { month: "", year: "" },
+                                jobStart: {
+                                    month: "",
+                                    year: "",
+                                },
+                                jobEnd: {
+                                    month: "",
+                                    year: "",
+                                },
                                 jobDescription: "",
                                 jobLocalization: "",
                             })
                         }
                     >
-                        <Plus /> Adicionar
+                        <Plus />
+                        Adicionar
                     </Button>
                 </div>
             </CardHeader>
@@ -68,9 +102,13 @@ export function ExperienceCard() {
                             {/* EMPRESA */}
                             <Field>
                                 <FieldLabel>Empresa</FieldLabel>
+
                                 <Input
-                                    {...register(`experience.${index}.enterpriseName`)}
+                                    {...register(
+                                        `experience.${index}.enterpriseName`
+                                    )}
                                 />
+
                                 <FieldError>
                                     {
                                         formState.errors.experience?.[index]
@@ -82,9 +120,13 @@ export function ExperienceCard() {
                             {/* CARGO */}
                             <Field>
                                 <FieldLabel>Cargo</FieldLabel>
+
                                 <Input
-                                    {...register(`experience.${index}.job`)}
+                                    {...register(
+                                        `experience.${index}.job`
+                                    )}
                                 />
+
                                 <FieldError>
                                     {
                                         formState.errors.experience?.[index]
@@ -96,11 +138,22 @@ export function ExperienceCard() {
                             {/* LOCAL */}
                             <Field>
                                 <FieldLabel>Local</FieldLabel>
+
                                 <Input
-                                    {...register(`experience.${index}.jobLocalization`)}
+                                    {...register(
+                                        `experience.${index}.jobLocalization`
+                                    )}
                                 />
+
+                                <FieldError>
+                                    {
+                                        formState.errors.experience?.[index]
+                                            ?.jobLocalization?.message
+                                    }
+                                </FieldError>
                             </Field>
 
+                            {/* DATAS */}
                             <div className="grid grid-cols-2 gap-4">
 
                                 {/* INÍCIO */}
@@ -108,25 +161,38 @@ export function ExperienceCard() {
                                     <FieldLabel>Início</FieldLabel>
 
                                     <div className="flex gap-2">
+
                                         <select
-                                            {...register(`experience.${index}.jobStart.month`)}
+                                            {...register(
+                                                `experience.${index}.jobStart.month`
+                                            )}
                                             className="border rounded p-2 w-full"
                                         >
                                             <option value="">Mês</option>
+
                                             {months.map((m) => (
-                                                <option key={m.value} value={m.value}>
+                                                <option
+                                                    key={m.value}
+                                                    value={m.value}
+                                                >
                                                     {m.label}
                                                 </option>
                                             ))}
                                         </select>
 
                                         <select
-                                            {...register(`experience.${index}.jobStart.year`)}
+                                            {...register(
+                                                `experience.${index}.jobStart.year`
+                                            )}
                                             className="border rounded p-2 w-full"
                                         >
                                             <option value="">Ano</option>
+
                                             {years.map((y) => (
-                                                <option key={y} value={y}>
+                                                <option
+                                                    key={y}
+                                                    value={y}
+                                                >
                                                     {y}
                                                 </option>
                                             ))}
@@ -135,7 +201,8 @@ export function ExperienceCard() {
 
                                     <FieldError>
                                         {
-                                            formState.errors.experience?.[index]?.jobStart?.month?.message
+                                            formState.errors.experience?.[index]
+                                                ?.jobStart?.month?.message
                                         }
                                     </FieldError>
                                 </Field>
@@ -145,40 +212,69 @@ export function ExperienceCard() {
                                     <FieldLabel>Fim</FieldLabel>
 
                                     <div className="flex gap-2">
+
                                         <select
-                                            {...register(`experience.${index}.jobEnd.month`)}
+                                            {...register(
+                                                `experience.${index}.jobEnd.month`
+                                            )}
                                             className="border rounded p-2 w-full"
                                         >
                                             <option value="">Mês</option>
+
                                             {months.map((m) => (
-                                                <option key={m.value} value={m.value}>
+                                                <option
+                                                    key={m.value}
+                                                    value={m.value}
+                                                >
                                                     {m.label}
                                                 </option>
                                             ))}
                                         </select>
 
                                         <select
-                                            {...register(`experience.${index}.jobEnd.year`)}
+                                            {...register(
+                                                `experience.${index}.jobEnd.year`
+                                            )}
                                             className="border rounded p-2 w-full"
                                         >
                                             <option value="">Ano</option>
+
                                             {years.map((y) => (
-                                                <option key={y} value={y}>
+                                                <option
+                                                    key={y}
+                                                    value={y}
+                                                >
                                                     {y}
                                                 </option>
                                             ))}
                                         </select>
                                     </div>
-                                </Field>
 
+                                    <FieldError>
+                                        {
+                                            formState.errors.experience?.[index]
+                                                ?.jobEnd?.month?.message
+                                        }
+                                    </FieldError>
+                                </Field>
                             </div>
 
                             {/* DESCRIÇÃO */}
                             <Field className="col-span-2">
                                 <FieldLabel>Descrição</FieldLabel>
+
                                 <Textarea
-                                    {...register(`experience.${index}.jobDescription`)}
+                                    {...register(
+                                        `experience.${index}.jobDescription`
+                                    )}
                                 />
+
+                                <FieldError>
+                                    {
+                                        formState.errors.experience?.[index]
+                                            ?.jobDescription?.message
+                                    }
+                                </FieldError>
                             </Field>
 
                             {/* REMOVER */}

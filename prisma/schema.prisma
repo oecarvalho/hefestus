@@ -29,7 +29,7 @@ model Curriculum{
   email String
   phoneNumber String
 
-  birthday DateTime
+  birthday DateTime?
 
   linkedin String
   portfolio String

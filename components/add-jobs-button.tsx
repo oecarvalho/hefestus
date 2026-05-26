@@ -61,7 +61,10 @@ const AddJobsButton = () => {
         // console.log('Informação Salva', jobs)
 
         try {
-            await createNewJob(data)
+            await createNewJob({
+                ...data,
+                jobStatus: "aplicado"
+            })
 
             console.log('Vaga cadastrada com sucesso')
 

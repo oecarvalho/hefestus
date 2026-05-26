@@ -3,6 +3,13 @@
 import { prisma } from "@/lib/prisma";
 import { calculeMatch } from "./calcule-match";
 
+type DashboardJob = {
+    id: string;
+    status: string;
+    extractedSkills: unknown;
+    date: Date;
+};
+
 export async function getDashboardMetrics() {
 
     const userId = "123";
@@ -18,7 +25,7 @@ export async function getDashboardMetrics() {
         },
     });
 
-    const jobs = await prisma.job.findMany({
+    const jobsRaw = await prisma.job.findMany({
         orderBy: {
             date: "desc",
         },
@@ -31,14 +38,16 @@ export async function getDashboardMetrics() {
         },
     });
 
+    const jobs: DashboardJob[] = jobsRaw;
+
     const totalJobs = jobs.length;
 
     const andamento = jobs.filter(
-        (job) => job.status === "andamento"
+        (job: DashboardJob) => job.status === "andamento"
     ).length;
 
     const rejeitadas = jobs.filter(
-        (job) => job.status === "rejeitado"
+        (job: DashboardJob) => job.status === "rejeitado"
     ).length;
 
     const userSkills = [
@@ -46,7 +55,7 @@ export async function getDashboardMetrics() {
         ...(curriculum?.tools || []),
     ];
 
-    const matches = jobs.map((job) => {
+    const matches = jobs.map((job: DashboardJob) => {
 
         const jobSkills = Array.isArray(job.extractedSkills)
             ? (job.extractedSkills as string[])
