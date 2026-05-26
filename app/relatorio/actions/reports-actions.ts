@@ -88,23 +88,45 @@ export async function getReportsData() {
     // EMPRESAS
     // =========================
 
-    const companiesMap: Record<string, number> = {};
+    const companiesMap = new Map();
 
     jobs.forEach((job) => {
 
-        const company = job.nameEnterprise;
+        const companyName =
+            job.nameEnterprise?.toLowerCase();
 
-        companiesMap[company] =
-            (companiesMap[company] || 0) + 1;
+        if (!companyName) return;
+
+        const existing =
+            companiesMap.get(companyName);
+
+        if (existing) {
+
+            existing.total += 1;
+
+            if (job.status === "andamento") {
+                existing.andamento += 1;
+            }
+
+        } else {
+
+            companiesMap.set(companyName, {
+                name: job.nameEnterprise,
+                total: 1,
+                andamento:
+                    job.status === "andamento"
+                        ? 1
+                        : 0,
+            });
+        }
     });
 
-    const companies = Object.entries(companiesMap)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([name, amount]) => ({
-            name,
-            amount,
-        }));
+    const companies = Array.from(
+        companiesMap.values()
+    )
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 5);
+
 
     // =========================
     // FORÇAS DO PERFIL
