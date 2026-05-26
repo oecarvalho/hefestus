@@ -44,7 +44,7 @@ export async function getDashboardMetrics() {
     ).length;
 
     const rejeitadas = jobs.filter(
-        job => job.status === "rejeitado"
+       (job: Job) => job.status === "rejeitado"
     ).length;
 
     const userSkills = [
