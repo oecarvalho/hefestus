@@ -1,3 +1,5 @@
+import { unstable_noStore as noStore } from "next/cache";
+
 interface CalculateMatchProps {
   userSkills: string[]
   jobSkills: string[]
@@ -7,7 +9,7 @@ export function calculeMatch({
   userSkills,
   jobSkills,
 }: CalculateMatchProps) {
-
+  noStore();
   if (jobSkills.length === 0) {
     return {
       matchScore: 0,

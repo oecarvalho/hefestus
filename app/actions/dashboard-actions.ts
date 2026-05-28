@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { calculeMatch } from "./calcule-match";
-
+import { unstable_noStore as noStore } from "next/cache";
 type DashboardJob = {
     id: string;
     status: string;
@@ -11,7 +11,7 @@ type DashboardJob = {
 };
 
 export async function getDashboardMetrics() {
-
+noStore();
     const userId = "123";
 
     const curriculum = await prisma.curriculum.findUnique({

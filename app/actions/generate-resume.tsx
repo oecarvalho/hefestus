@@ -1,4 +1,5 @@
 'use server'
+import { unstable_noStore as noStore } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
 import { generateResumeAI } from "@/lib/generate-resume";
@@ -9,6 +10,7 @@ export async function generateResumePdf(
   jobId: string,
   userId: string
 ) {
+    noStore();
 
   const job = await prisma.job.findUnique({
     where: {

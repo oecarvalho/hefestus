@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { unstable_noStore as noStore } from "next/cache";
 
 interface Experience {
   enterpriseName: string;
@@ -75,7 +76,7 @@ export async function saveCurriculum(
   userId: string,
   data: SaveCurriculumProps
 ) {
-
+noStore();
   const curriculumData: {
     name: string
     email: string

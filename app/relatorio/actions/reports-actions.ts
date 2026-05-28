@@ -1,9 +1,9 @@
 'use server'
-
+import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 export async function getReportsData() {
-
+    noStore();
     const jobs = await prisma.job.findMany({
         select: {
             id: true,
