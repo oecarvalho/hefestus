@@ -1,4 +1,4 @@
-````markdown
+
 # ⚒️ Hefestus — Forje a sua carreira!
 
 <p align="center">
@@ -394,4 +394,4 @@ Mais do que um projeto de portfólio, o Hefestus demonstra capacidade de desenvo
 Se este projeto foi útil para você, considere deixar uma ⭐ no repositório.
 
 ---
-````
+
