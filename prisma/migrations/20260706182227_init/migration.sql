@@ -15,10 +15,11 @@ CREATE TABLE "job" (
 -- CreateTable
 CREATE TABLE "curriculums" (
     "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
-    "birthday" TIMESTAMP(3) NOT NULL,
+    "birthday" TIMESTAMP(3),
     "linkedin" TEXT NOT NULL,
     "portfolio" TEXT NOT NULL,
     "resume" TEXT NOT NULL,
@@ -80,6 +81,9 @@ CREATE TABLE "languages" (
 
     CONSTRAINT "languages_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "curriculums_userId_key" ON "curriculums"("userId");
 
 -- AddForeignKey
 ALTER TABLE "experiences" ADD CONSTRAINT "experiences_curriculumId_fkey" FOREIGN KEY ("curriculumId") REFERENCES "curriculums"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
