@@ -8,6 +8,14 @@ export function calculateMatch({
   curriculumSkills
 }: CalculateMatchProps) {
 
+  if (jobSkills.length === 0) {
+    return {
+      matchingSkills: [],
+      missingSkills: [],
+      matchScore: 0
+    };
+  }
+
   const normalizedJobSkills =
     jobSkills.map(skill =>
       skill.toLowerCase().trim()

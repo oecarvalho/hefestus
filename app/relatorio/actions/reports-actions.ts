@@ -1,20 +1,42 @@
 'use server'
 import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth";
 
 export async function getReportsData() {
     noStore();
+    const session = await getSession();
+    if (!session) {
+        return {
+            technologies: [],
+            missingSkills: [],
+            companies: [],
+            strengths: [],
+            decayWatch: [],
+            adjacentSkills: [],
+            averageResponseDays: 0,
+        };
+    }
+    const userId = session.userId;
+
     const jobs = await prisma.job.findMany({
+        where: {
+            userId
+        },
         select: {
             id: true,
             status: true,
             extractedSkills: true,
             nameEnterprise: true,
             date: true,
+            updatedAt: true,
         }
     });
 
-    const curriculum = await prisma.curriculum.findFirst({
+    const curriculum = await prisma.curriculum.findUnique({
+        where: {
+            userId
+        },
         select: {
             skills: true,
             tools: true,
@@ -204,15 +226,27 @@ export async function getReportsData() {
         .slice(0, 6)
         .map(([skill, amount]) => ({
             skill,
-            relation: "suas skills",
-            value: Math.min(amount * 20, 100),
+            relation: "presença nas vagas",
+            value: jobs.length > 0 ? Math.round((amount / jobs.length) * 100) : 0,
         }));
 
     // =========================
-    // TEMPO MÉDIO
+    // TEMPO MÉDIO DE RESPOSTA REAL
     // =========================
 
-    const averageResponseDays = 7;
+    const jobsWithResponse = jobs.filter(
+        (job) => job.status !== "aplicado"
+    );
+
+    let averageResponseDays = 0;
+    if (jobsWithResponse.length > 0) {
+        const totalDays = jobsWithResponse.reduce((sum, job) => {
+            const diffTime = Math.abs(new Date(job.updatedAt).getTime() - new Date(job.date).getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return sum + diffDays;
+        }, 0);
+        averageResponseDays = Math.round(totalDays / jobsWithResponse.length);
+    }
 
     return {
         technologies,

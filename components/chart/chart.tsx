@@ -94,7 +94,7 @@ export function GraficoAplicacoes({ jobs }: GraficoAplicacoesProps) {
               content={
                 <ChartTooltipContent
                   className="w-[150px]"
-                  nameKey="views"
+                  nameKey="applications"
                   labelFormatter={(value) => {
                     return new Date(value).toLocaleDateString("pt-BR", {
                       month: "short",
