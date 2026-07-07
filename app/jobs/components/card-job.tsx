@@ -10,7 +10,7 @@ import Link from "next/link";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { deleteNewJob, updateJobStatus } from "@/app/actions/actions";
 import { toast } from "sonner";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { getDaysAgo } from "@/lib/get-days";
 
 interface CardJobsProps {
@@ -33,6 +33,14 @@ interface CardJobsProps {
 export function CardJobs({ job, match }: CardJobsProps) {
     const [status, setStatus] = useState(job.status ?? "aplicado");
     const [isPending, startTransition] = useTransition();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setMounted(true);
+        }, 0);
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleDelete = async () => {
         const result = await deleteNewJob(job.id);
@@ -114,7 +122,7 @@ export function CardJobs({ job, match }: CardJobsProps) {
 
 
 
-                <Badge> {getDaysAgo(job.date)}</Badge>
+                <Badge> {mounted ? getDaysAgo(job.date) : "..."}</Badge>
             </CardContent>
             <CardFooter className="flex items-center justify-between pt-2 border-t">
 

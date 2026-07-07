@@ -1,8 +1,9 @@
 'use server'
 
 import { prisma } from "@/lib/prisma";
-import { calculeMatch } from "./calcule-match";
+import { calculateMatch } from "@/lib/match";
 import { unstable_noStore as noStore } from "next/cache";
+import { getSession } from "@/lib/auth";
 type DashboardJob = {
     id: string;
     status: string;
@@ -12,7 +13,17 @@ type DashboardJob = {
 
 export async function getDashboardMetrics() {
 noStore();
-    const userId = "123";
+    const session = await getSession();
+    if (!session) {
+        return {
+            totalJobs: 0,
+            andamento: 0,
+            rejeitadas: 0,
+            averageMatch: 0,
+            jobs: [],
+        };
+    }
+    const userId = session.userId;
 
     const curriculum = await prisma.curriculum.findUnique({
         where: {
@@ -26,6 +37,9 @@ noStore();
     });
 
     const jobsRaw = await prisma.job.findMany({
+        where: {
+            userId,
+        },
         orderBy: {
             date: "desc",
         },
@@ -61,8 +75,8 @@ noStore();
             ? (job.extractedSkills as string[])
             : [];
 
-        const match = calculeMatch({
-            userSkills,
+        const match = calculateMatch({
+            curriculumSkills: userSkills,
             jobSkills,
         });
 

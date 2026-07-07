@@ -3,6 +3,75 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { unstable_noStore as noStore } from "next/cache";
+import { getSession } from "@/lib/auth";
+import { z } from "zod";
+
+const personalSchema = z.object({
+  name: z.string().trim().min(1, "Nome é obrigatório!"),
+  email: z.string().email("E-mail inválido"),
+  phoneNumber: z.string().min(1, "Telefone é obrigatório!"),
+  birthday: z.preprocess(
+    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
+    z.date().optional().nullable()
+  ),
+  linkedin: z.string().url().optional().or(z.literal("")).nullable(),
+  portifolio: z.string().url().optional().or(z.literal("")).nullable(),
+});
+
+const resumeSchema = z.object({
+  resume: z.string().min(50, "É preciso preencher seu resumo profissional!"),
+});
+
+const experienceSchema = z.object({
+  enterpriseName: z.string().min(3, "Preencha o nome da empresa."),
+  job: z.string().trim().min(1, "Preencha o seu cargo."),
+  jobStart: z.object({
+    month: z.string(),
+    year: z.string(),
+  }),
+  jobEnd: z.object({
+    month: z.string(),
+    year: z.string(),
+  }).optional().nullable(),
+  jobDescription: z.string().min(1, "Preencha a descrição do trabalho."),
+  jobLocalization: z.string().min(1, "Digite o país da empresa."),
+});
+
+const educationSchema = z.object({
+  institutionName: z.string().min(3, "Digite o nome da instituição."),
+  title: z.string().min(1, "Digite o título da graduação."),
+  start: z.object({
+    month: z.string(),
+    year: z.string(),
+  }),
+  end: z.object({
+    month: z.string(),
+    year: z.string(),
+  }).optional().nullable(),
+  description: z.string().min(1, "Descreva as atividades."),
+});
+
+const projectSchema = z.object({
+  projectName: z.string().trim().min(1, "Digite o nome do projeto."),
+  projectLink: z.string().url("Link inválido"),
+  projectDescription: z.string().min(1, "Descreva o projeto."),
+});
+
+const languageSchema = z.object({
+  language: z.string().min(1, "Digite o idioma."),
+  level: z.string().min(1, "Selecione o nível de proficiência."),
+});
+
+const curriculumSchema = z.object({
+  personalInfo: personalSchema,
+  resume: resumeSchema,
+  experience: z.array(experienceSchema),
+  education: z.array(educationSchema),
+  skills: z.array(z.string()).min(1, "Adicione pelo menos uma habilidade."),
+  tools: z.array(z.string()).min(1, "Adicione pelo menos uma ferramenta."),
+  projects: z.array(projectSchema),
+  languages: z.array(languageSchema),
+});
 
 interface Experience {
   enterpriseName: string;
@@ -77,6 +146,13 @@ export async function saveCurriculum(
   data: SaveCurriculumProps
 ) {
 noStore();
+  const session = await getSession();
+  if (!session || session.userId !== userId) {
+    throw new Error("Acesso não autorizado.");
+  }
+
+  const validated = curriculumSchema.parse(data);
+
   const curriculumData: {
     name: string
     email: string
@@ -88,28 +164,28 @@ noStore();
     tools: string[]
     birthday?: Date
   } = {
-    name: data.personalInfo.name,
+    name: validated.personalInfo.name,
 
-    email: data.personalInfo.email,
+    email: validated.personalInfo.email,
 
-    phoneNumber: data.personalInfo.phoneNumber,
+    phoneNumber: validated.personalInfo.phoneNumber,
 
-    linkedin: data.personalInfo.linkedin || "",
+    linkedin: validated.personalInfo.linkedin || "",
 
-    portfolio: data.personalInfo.portifolio || "",
+    portfolio: validated.personalInfo.portifolio || "",
 
-    resume: data.resume.resume,
+    resume: validated.resume.resume,
 
-    skills: data.skills,
+    skills: validated.skills,
 
-    tools: data.tools,
+    tools: validated.tools,
   };
 
-  if (data.personalInfo.birthday instanceof Date) {
-    curriculumData.birthday = data.personalInfo.birthday;
+  if (validated.personalInfo.birthday instanceof Date) {
+    curriculumData.birthday = validated.personalInfo.birthday;
   }
 
-  const experiencesData = data.experience.map((exp: Experience) => ({
+  const experiencesData = validated.experience.map((exp) => ({
     enterpriseName: exp.enterpriseName,
 
     job: exp.job,
@@ -127,7 +203,7 @@ noStore();
     jobLocalization: exp.jobLocalization,
   }));
 
-  const educationsData = data.education.map((edu: Education) => ({
+  const educationsData = validated.education.map((edu) => ({
     institutionName: edu.institutionName,
 
     title: edu.title,
@@ -143,7 +219,7 @@ noStore();
     description: edu.description,
   }));
 
-  const projectsData = data.projects.map((project: Project) => ({
+  const projectsData = validated.projects.map((project) => ({
     projectName: project.projectName,
 
     projectLink: project.projectLink,
@@ -151,7 +227,7 @@ noStore();
     projectDescription: project.projectDescription,
   }));
 
-  const languagesData = data.languages.map((language: Language) => ({
+  const languagesData = validated.languages.map((language) => ({
     language: language.language,
 
     level: language.level,
@@ -224,6 +300,10 @@ noStore();
 }
 
 export async function getCurriculum(userId: string) {
+  const session = await getSession();
+  if (!session || session.userId !== userId) {
+    throw new Error("Acesso não autorizado.");
+  }
 
   return prisma.curriculum.findUnique({
 

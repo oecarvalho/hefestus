@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 
 import { generateResumePdf } from "@/app/actions/generate-resume";
 
-import { FileText, WandSparkles } from "lucide-react";
+import { WandSparkles } from "lucide-react";
 
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 export function GenerateResumeButton({
   jobId,
@@ -22,22 +23,28 @@ export function GenerateResumeButton({
   async function handleGenerate() {
 
     startTransition(async () => {
+      try {
+        const result =
+          await generateResumePdf(
+            jobId,
+            userId
+          );
 
-      const result =
-        await generateResumePdf(
-          jobId,
-          userId
-        );
+        const link = document.createElement("a");
 
-      const link = document.createElement("a");
+        link.href =
+          `data:application/pdf;base64,${result.file}`;
 
-      link.href =
-        `data:application/pdf;base64,${result.file}`;
+        link.download =
+          "curriculo.pdf";
 
-      link.download =
-        "curriculo.pdf";
-
-      link.click();
+        link.click();
+        toast.success("Currículo personalizado gerado com sucesso!");
+      } catch (error) {
+        console.error('Erro ao gerar currículo:', error);
+        const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro ao gerar o currículo.";
+        toast.error(errorMessage);
+      }
     });
   }
 

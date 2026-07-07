@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/input-group";
 
 import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
 
 import {
     usePathname,
@@ -22,34 +23,47 @@ export default function JobsSearch(){
 
     const searchParams = useSearchParams();
 
-    function handleSearch(value: string){
+    const currentSearch = searchParams.get('search') || '';
+    const [inputValue, setInputValue] = useState(currentSearch);
+    const [prevSearch, setPrevSearch] = useState(currentSearch);
 
-        const params = new URLSearchParams(
-            searchParams
-        );
-
-        if(value){
-
-            params.set('search', value);
-
-        } else {
-
-            params.delete('search');
-
-        }
-
-        router.push(
-            `${pathname}?${params.toString()}`
-        );
+    if (currentSearch !== prevSearch) {
+        setPrevSearch(currentSearch);
+        setInputValue(currentSearch);
     }
+
+    // Executar re-roteamento com debounce de 350ms
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            const params = new URLSearchParams(searchParams);
+            const urlQuery = params.get('search') || '';
+            
+            if (inputValue === urlQuery) {
+                return;
+            }
+
+            if (inputValue) {
+                params.set('search', inputValue);
+            } else {
+                params.delete('search');
+            }
+
+            router.push(`${pathname}?${params.toString()}`);
+        }, 350);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [inputValue, router, pathname, searchParams]);
 
     return (
         <InputGroup className="max-w-full">
 
             <InputGroupInput
                 placeholder="Buscar por cargo ou empresa..."
+                value={inputValue}
                 onChange={(e) =>
-                    handleSearch(e.target.value)
+                    setInputValue(e.target.value)
                 }
             />
 

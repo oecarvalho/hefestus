@@ -5,6 +5,8 @@ import AddJobsButton from "@/components/add-jobs-button";
 import JobsFilter from "./components/jobs-filter";
 import JobsSearch from "./components/job-search";
 import { calculateMatch } from "@/lib/match";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 interface JobsPageProps {
     searchParams: Promise<{
@@ -14,13 +16,18 @@ interface JobsPageProps {
 }
 
 export default async function Jobs({ searchParams }: JobsPageProps) {
+    const session = await getSession();
+    if (!session) {
+        redirect('/login');
+    }
+    const userId = session.userId;
 
     const { status, search } = await searchParams
 
     const jobs = await prisma.job.findMany({
         where: {
             AND: [
-
+                { userId },
                 status
                     ? { status }
                     : {},
@@ -48,7 +55,9 @@ export default async function Jobs({ searchParams }: JobsPageProps) {
         }
     })
 
-    const curriculum = await prisma.curriculum.findFirst();
+    const curriculum = await prisma.curriculum.findUnique({
+        where: { userId }
+    });
 
     const jobsWithMatch = jobs.map((job) => {
 
@@ -72,7 +81,7 @@ export default async function Jobs({ searchParams }: JobsPageProps) {
     });
 
     return (
-        <section className="h-full w-300 m-auto py-16">
+        <section className="h-full max-w-6xl w-full px-4 m-auto py-16">
             <div className="flex justify-between items-end mb-7">
                 <div>
                     <h1 className="text-3xl font-bold">Vagas</h1>

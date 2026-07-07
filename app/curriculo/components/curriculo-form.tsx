@@ -3,7 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { z } from "zod";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, FieldErrors } from "react-hook-form";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Prisma } from "@prisma/client";
 
@@ -271,28 +272,28 @@ export default function CurriculoForm({
             languages: [],
         };
 
-    const form = useForm<
-        CurriculumFormData,
-        any,
-        CurriculumFormData
-    >({
+    const form = useForm<CurriculumFormData>({
         resolver: zodResolver(curriculumSchema),
 
         defaultValues,
     });
 
     const onSubmit = async (data: CurriculumFormData) => {
-        await saveCurriculum(userId, data);
-
-        console.log("SALVO", data);
+        try {
+            await saveCurriculum(userId, data);
+            toast.success("Currículo base salvo com sucesso!");
+        } catch (error) {
+            console.error("Erro ao salvar currículo:", error);
+            toast.error("Ocorreu um erro ao salvar o currículo.");
+        }
     };
 
-    const onError = (errors: any) => {
+    const onError = (errors: FieldErrors<CurriculumFormData>) => {
         console.log(errors);
     };
 
     return (
-        <section className="h-full w-300 m-auto py-16">
+        <section className="h-full max-w-6xl w-full px-4 m-auto py-16">
 
             <div className="flex justify-between items-end">
                 <div>
@@ -477,9 +478,11 @@ export default function CurriculoForm({
 
                     </div>
 
-                    <Button type="submit">
-                        Salvar Currículo
-                    </Button>
+                    <div className="flex justify-end mt-8 mb-16">
+                        <Button type="submit" size="lg" className="px-8 font-medium">
+                            Salvar Currículo
+                        </Button>
+                    </div>
 
                 </form>
 

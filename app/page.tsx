@@ -9,7 +9,7 @@ export default async function Home() {
   const metrics = await getDashboardMetrics();
 
   return (
-    <section className="h-full w-300 m-auto py-16">
+    <section className="h-full max-w-6xl w-full px-4 m-auto py-16">
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>

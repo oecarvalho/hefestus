@@ -1,13 +1,13 @@
-import { generateResumePdf } from "@/app/actions/generate-resume"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { calculateMatch } from "@/lib/match"
 import { prisma } from "@/lib/prisma"
-import { ArrowLeft, Building2, MapPin, WandSparkles } from "lucide-react"
+import { ArrowLeft, Building2, MapPin } from "lucide-react"
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { GenerateResumeButton } from "../components/generate-resume-button"
+import { getSession } from "@/lib/auth"
 
 interface JobPageProps {
   params: Promise<{
@@ -16,6 +16,10 @@ interface JobPageProps {
 }
 
 export default async function JobPage({ params }: JobPageProps) {
+  const session = await getSession();
+  if (!session) {
+    redirect('/login');
+  }
 
   const { id } = await params
 
@@ -25,11 +29,15 @@ export default async function JobPage({ params }: JobPageProps) {
     }
   })
 
-  if (!job) {
+  if (!job || job.userId !== session.userId) {
     return notFound()
   }
 
-  const curriculum = await prisma.curriculum.findFirst();
+  const curriculum = await prisma.curriculum.findUnique({
+    where: {
+      userId: session.userId
+    }
+  });
 
   const match = calculateMatch({
 
@@ -44,18 +52,10 @@ export default async function JobPage({ params }: JobPageProps) {
     ]
   });
 
-  const handleGenerateResume = async () => {
 
-    const result = await generateResumePdf(
-      job.id,
-      "123"
-    );
-
-    console.log(result);
-  }
 
   return (
-    <section className="h-full w-300 m-auto py-16">
+    <section className="h-full max-w-6xl w-full px-4 m-auto py-16">
 
       <div className="flex justify-between items-end mb-4">
         <div>
@@ -76,7 +76,7 @@ export default async function JobPage({ params }: JobPageProps) {
 
         </div>
 
-        <GenerateResumeButton jobId={job.id} userId="123"/>
+        <GenerateResumeButton jobId={job.id} userId={session.userId}/>
       </div>
 
       <div className="grid grid-cols-[2fr_1fr] gap-4">
@@ -92,7 +92,7 @@ export default async function JobPage({ params }: JobPageProps) {
           </CardContent>
         </Card>
 
-        <div className="w-full max-w-100 flex flex-col gap-8">
+        <div className="w-full flex flex-col gap-8">
           <Card>
             <CardHeader>
               <CardTitle>Match da Vaga</CardTitle>

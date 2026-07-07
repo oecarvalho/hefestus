@@ -11,6 +11,8 @@ import { Input } from "./ui/input";
 import { SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, Select } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import { createNewJob } from "@/app/actions/actions";
+import { useState } from "react";
+import { toast } from "sonner";
 
 
 const formSchema = z.object({
@@ -33,6 +35,7 @@ type FormSchema = z.infer<typeof formSchema>
 
 const AddJobsButton = () => {
 
+    const [open, setOpen] = useState(false);
 
     const form = useForm<FormSchema>({
         resolver: zodResolver(formSchema),
@@ -45,38 +48,24 @@ const AddJobsButton = () => {
     })
 
     const onSubmit = async (data: FormSchema) => {
-        // const newJob = {
-        //     ...data,
-        //     id: crypto.randomUUID(),
-        //     createdAt: new Date().toISOString()
-        // }
-
-        // const storedJobs = localStorage.getItem('jobs')
-        // const jobs = storedJobs ? JSON.parse(storedJobs) : []
-
-        // jobs.push(newJob);
-
-        // localStorage.setItem('jobs', JSON.stringify(jobs));
-
-        // console.log('Informação Salva', jobs)
-
         try {
             await createNewJob({
                 ...data,
                 jobStatus: "aplicado"
             })
 
-            console.log('Vaga cadastrada com sucesso')
-
-            form.reset()
+            toast.success("Vaga cadastrada com sucesso!");
+            form.reset();
+            setOpen(false);
 
         } catch (error) {
-            console.log(error)
+            console.error('Erro ao cadastrar vaga:', error);
+            toast.error("Erro ao cadastrar a vaga. Tente novamente.");
         }
     }
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button><Plus />Nova Vaga</Button>
             </DialogTrigger>

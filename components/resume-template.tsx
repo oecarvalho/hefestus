@@ -119,6 +119,18 @@ const styles = StyleSheet.create({
     marginRight: 6,
     marginBottom: 6,
   },
+
+  // IDIOMAS
+  languagesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  languageItem: {
+    fontSize: 9,
+    marginRight: 16,
+    marginBottom: 4,
+    color: "#374151",
+  },
 });
 
 interface ResumeData {
@@ -136,6 +148,18 @@ interface ResumeData {
   projects: {
     projectName: string;
     projectDescription: string;
+  }[];
+
+  educations?: {
+    institutionName: string;
+    title: string;
+    period: string;
+    description?: string;
+  }[];
+
+  languages?: {
+    language: string;
+    level: string;
   }[];
 }
 
@@ -292,6 +316,53 @@ export function ResumeTemplate({
           ))}
 
         </View>
+
+        {/* EDUCATION */}
+
+        {data.educations && data.educations.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              Formação Acadêmica
+            </Text>
+            {data.educations.map((edu, idx) => (
+              <View key={idx} style={styles.item}>
+                <View style={styles.itemHeader}>
+                  <Text style={styles.itemTitle}>
+                    {edu.title}
+                  </Text>
+                  <Text style={styles.period}>
+                    {edu.period}
+                  </Text>
+                </View>
+                <Text style={styles.company}>
+                  {edu.institutionName}
+                </Text>
+                {edu.description ? (
+                  <Text style={styles.description}>
+                    {edu.description}
+                  </Text>
+                ) : null}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* LANGUAGES */}
+
+        {data.languages && data.languages.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              Idiomas
+            </Text>
+            <View style={styles.languagesContainer}>
+              {data.languages.map((lang, idx) => (
+                <Text key={idx} style={styles.languageItem}>
+                  <Text style={{ fontWeight: "bold" }}>{lang.language}:</Text> {lang.level}
+                </Text>
+              ))}
+            </View>
+          </View>
+        )}
 
       </Page>
     </Document>

@@ -1,9 +1,14 @@
 import { gemini } from "@/lib/gemini";
 import { buildResumePrompt } from "./resume-prompt";
 
+interface JobPromptData {
+  description: string;
+  extractedSkills: unknown;
+}
+
 interface GenerateResumeAIProps {
-  curriculum: any
-  job: any
+  curriculum: unknown;
+  job: JobPromptData;
 }
 
 export async function generateResumeAI({
@@ -18,7 +23,7 @@ export async function generateResumeAI({
 
   const response = await gemini.models.generateContent({
 
-    model: "gemini-3.5-flash",
+    model: "gemini-2.5-flash",
 
     contents: prompt,
   });
