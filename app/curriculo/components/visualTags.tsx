@@ -19,10 +19,10 @@ export function TagsInput({
   const [input, setInput] = useState("");
 
   const addTag = () => {
-    const trimmed = input.trim().toLowerCase();
+    const trimmed = input.trim();
 
     if (!trimmed) return;
-    if (value.includes(trimmed)) return;
+    if (value.some((t) => t.toLowerCase() === trimmed.toLowerCase())) return;
 
     if (maxTags && value.length >= maxTags) return;
 
@@ -40,13 +40,15 @@ export function TagsInput({
       {value.map((tag) => (
         <span
           key={tag}
-          className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-sm"
+          className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-sm capitalize"
         >
           {tag}
           <button
             type="button"
             onClick={() => removeTag(tag)}
             className="hover:text-destructive"
+            aria-label={`Remover tag ${tag}`}
+            title={`Remover tag ${tag}`}
           >
             <X size={14} />
           </button>
@@ -63,6 +65,7 @@ export function TagsInput({
             addTag();
           }
         }}
+        onBlur={addTag}
         placeholder={placeholder}
       />
     </div>

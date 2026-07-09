@@ -1,25 +1,28 @@
 'use client'
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { registerUser } from '@/app/actions/auth-actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
+import { InputGroup, InputGroupInput, InputGroupButton } from '@/components/ui/input-group';
 
 export default function CadastroPage() {
   const [state, formAction, isPending] = useActionState(registerUser, null);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-zinc-950 w-full">
-      <Card className="w-full max-w-md shadow-lg border-zinc-200 dark:border-zinc-800">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 w-full">
+      <Card className="w-full max-w-md shadow-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold tracking-tight text-center">
-            Criar conta no Hefestus
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-center">
+            Hefestus<span className="text-primary">.</span>
           </CardTitle>
           <CardDescription className="text-center">
-            Cadastre-se para começar a gerenciar suas candidaturas.
+            Forje a sua carreira. Cadastre-se para acessar suas vagas.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -46,13 +49,22 @@ export default function CadastroPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Senha (mínimo 6 caracteres)</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                required
-              />
+              <InputGroup>
+                <InputGroupInput
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  required
+                />
+                <InputGroupButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  title={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </InputGroupButton>
+              </InputGroup>
             </div>
             
             {state?.error && (

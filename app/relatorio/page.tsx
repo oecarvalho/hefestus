@@ -28,17 +28,17 @@ export default async function ReportsPage() {
     const report = await getReportsData();
 
     return (
-        <section className="h-full w-300 m-auto py-16">
+        <section className="h-full max-w-6xl w-full px-4 mx-auto py-16">
 
             {/* HEADER */}
-            <div className="flex justify-between items-end mb-7">
+            <div className="flex justify-between items-end mb-8 pb-4 border-b border-border/40">
 
                 <div>
-                    <h1 className="text-3xl font-bold">
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
                         Relatórios
                     </h1>
 
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                         Insights sobre o mercado e suas candidaturas.
                     </p>
                 </div>
@@ -46,7 +46,7 @@ export default async function ReportsPage() {
             </div>
 
             {/* GRID 1 */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
                 {/* TECNOLOGIAS */}
                 <Card>
@@ -148,25 +148,59 @@ export default async function ReportsPage() {
                     </CardHeader>
 
                     <CardContent className="space-y-4">
-
-                        <Progress
-                            value={Math.min(
-                                report.averageResponseDays * 10,
-                                100
-                            )}
-                            className="h-6"
-                        />
-
-                        <CardDescription>
-                            {report.averageResponseDays} dias em média até alteração de status
-                        </CardDescription>
-
+                        {(() => {
+                            const getResponseDaysColors = (days: number) => {
+                                if (days === 0) return {
+                                    indicator: "[&>[data-slot=progress-indicator]]:bg-zinc-300",
+                                    text: "text-zinc-500",
+                                    label: "Sem retorno cadastrado"
+                                };
+                                if (days < 5) return {
+                                    indicator: "[&>[data-slot=progress-indicator]]:bg-emerald-500",
+                                    text: "text-emerald-600 dark:text-emerald-400",
+                                    label: "Excelente tempo de retorno"
+                                };
+                                if (days <= 10) return {
+                                    indicator: "[&>[data-slot=progress-indicator]]:bg-amber-500",
+                                    text: "text-amber-600 dark:text-amber-400",
+                                    label: "Tempo de retorno aceitável"
+                                };
+                                return {
+                                    indicator: "[&>[data-slot=progress-indicator]]:bg-rose-500",
+                                    text: "text-rose-600 dark:text-rose-400",
+                                    label: "Tempo de retorno lento"
+                                };
+                            };
+                            const daysConfig = getResponseDaysColors(report.averageResponseDays);
+                            return (
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-baseline">
+                                        <span className={`text-2xl font-extrabold tracking-tight ${daysConfig.text}`}>
+                                            {report.averageResponseDays} {report.averageResponseDays === 1 ? 'dia' : 'dias'}
+                                        </span>
+                                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                            {daysConfig.label}
+                                        </span>
+                                    </div>
+                                    <Progress
+                                        value={Math.min(
+                                            report.averageResponseDays * 10,
+                                            100
+                                        )}
+                                        className={`h-2.5 w-full ${daysConfig.indicator}`}
+                                    />
+                                    <CardDescription className="text-xs pt-1">
+                                        Tempo médio entre o cadastro e a primeira mudança de status (Meta: &lt; 5 dias).
+                                    </CardDescription>
+                                </div>
+                            );
+                        })()}
                     </CardContent>
                 </Card>
             </div>
 
             {/* GRID 2 */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
                 {/* FORÇAS */}
                 <Card>
@@ -257,7 +291,7 @@ export default async function ReportsPage() {
                 </CardHeader>
 
                 <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {report.adjacentSkills.map((item, index) => (
                             <div
                                 key={`${item.skill}-${index}`}

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { z } from 'zod'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,7 +67,7 @@ const AddJobsButton = () => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button><Plus />Nova Vaga</Button>
+                <Button className="gap-2"><Plus size={16} />Nova Vaga</Button>
             </DialogTrigger>
 
             <DialogContent>
@@ -146,7 +146,16 @@ const AddJobsButton = () => {
 
                         </Field>
 
-                        <Button type="submit">Cadastrar Vaga</Button>
+                        <Button type="submit" disabled={form.formState.isSubmitting} className="gap-2 justify-center">
+                            {form.formState.isSubmitting ? (
+                                <>
+                                    <Loader2 className="animate-spin size-4" />
+                                    Analisando vaga com IA...
+                                </>
+                            ) : (
+                                "Cadastrar Vaga"
+                            )}
+                        </Button>
                     </FieldGroup>
                 </form>
 

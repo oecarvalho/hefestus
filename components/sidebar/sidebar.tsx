@@ -1,9 +1,12 @@
 'use client'
-import { Briefcase, FileChartLine, FileText, LayoutGrid, LogOut } from "lucide-react"
+import { Briefcase, FileChartLine, FileText, LayoutGrid, LogOut, Menu } from "lucide-react"
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { logoutUser } from "@/app/actions/auth-actions"
+import { useState } from "react"
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog"
+import { cn } from "@/lib/utils"
 
 interface SidebarProps {
   user?: {
@@ -14,66 +17,108 @@ interface SidebarProps {
 
 export const Sidebar = ({ user }: SidebarProps) => {
     const pathname = usePathname()
+    const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     if (pathname === '/login' || pathname === '/cadastro') {
         return null;
     }
 
-    return (
-        <div className="w-64 bg-white border-r-1 flex flex-col justify-between h-screen sticky top-0">
-            <div>
-                <div className="px-8 py-6">
-                    <h1 className="text-2xl font-bold">Hefestus</h1>
-                    <p className="text-sm text-shadow-gray-300">Forje a sua carreira</p>
-                </div>
+    const navigationItems = (onItemClick?: () => void) => {
+        const getButtonClass = (path: string) => {
+            const isActive = pathname === path;
+            return cn(
+                "justify-start gap-2 transition-all border-l-2 pl-3 rounded-l-none w-full",
+                isActive 
+                    ? "border-l-primary bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary font-medium" 
+                    : "border-l-transparent text-muted-foreground hover:text-foreground"
+            );
+        };
 
-                <div className="flex flex-col gap-2 p-2">
-                    <Button variant={pathname === '/' ? 'secondary' : 'ghost'}
-                        className="justify-start" asChild>
-                        <Link href='/'>
-                            <LayoutGrid />
-                            Dashboard
-                        </Link>
-                    </Button>
-                    <Button variant={pathname === '/curriculo' ? 'secondary' : 'ghost'}
-                        className="justify-start" asChild>
-                        <Link href='/curriculo'>
-                            <FileText />
-                            Currículo
-                        </Link>
-                    </Button>
-                    <Button variant={pathname === '/jobs' ? 'secondary' : 'ghost'}
-                        className="justify-start" asChild>
-                        <Link href='/jobs'>
-                            <Briefcase />
-                            Vagas
-                        </Link>
-                    </Button>
-                    <Button variant={pathname === '/relatorio' ? 'secondary' : 'ghost'}
-                        className="justify-start" asChild><Link href='/relatorio'>
-                            <FileChartLine />
-                            Relatório
-                        </Link>
-                    </Button>
+        return (
+            <div className="flex flex-col gap-1.5 p-2">
+                <Button variant="ghost" className={getButtonClass('/')} asChild onClick={onItemClick}>
+                    <Link href='/'>
+                        <LayoutGrid size={18} />
+                        Dashboard
+                    </Link>
+                </Button>
+                <Button variant="ghost" className={getButtonClass('/curriculo')} asChild onClick={onItemClick}>
+                    <Link href='/curriculo'>
+                        <FileText size={18} />
+                        Currículo
+                    </Link>
+                </Button>
+                <Button variant="ghost" className={getButtonClass('/jobs')} asChild onClick={onItemClick}>
+                    <Link href='/jobs'>
+                        <Briefcase size={18} />
+                        Vagas
+                    </Link>
+                </Button>
+                <Button variant="ghost" className={getButtonClass('/relatorio')} asChild onClick={onItemClick}>
+                    <Link href='/relatorio'>
+                        <FileChartLine size={18} />
+                        Relatório
+                    </Link>
+                </Button>
+            </div>
+        );
+    };
+
+    const userInfoSection = (
+        user && (
+            <div className="p-4 border-t border-sidebar-border flex flex-col gap-2 bg-sidebar-accent/30">
+                <div className="px-2 py-1 flex flex-col">
+                    <span className="text-sm font-semibold truncate text-foreground">{user.name || 'Candidato'}</span>
+                    <span className="text-xs text-muted-foreground truncate">{user.email}</span>
                 </div>
+                <Button 
+                    variant="ghost" 
+                    className="justify-start text-red-500 hover:text-red-500 hover:bg-red-50/50 dark:hover:bg-red-950/20"
+                    onClick={() => logoutUser()}
+                >
+                    <LogOut className="size-4 mr-2" />
+                    Sair
+                </Button>
+            </div>
+        )
+    );
+
+    return (
+        <>
+            {/* Header de Navegação Mobile (visível em telas menores de 768px) */}
+            <div className="flex md:hidden w-full border-b border-sidebar-border bg-sidebar items-center justify-between px-4 py-3 sticky top-0 z-40">
+                <h1 className="text-xl font-bold tracking-tight text-foreground">Hefestus</h1>
+                
+                <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="icon" aria-label="Abrir menu de navegação" className="text-foreground">
+                            <Menu size={20} />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="fixed inset-y-0 left-0 z-50 h-full w-64 border-r border-sidebar-border bg-sidebar p-0 shadow-lg translate-x-0 translate-y-0 top-0 left-0 max-w-none sm:max-w-none flex flex-col justify-between gap-0">
+                        <div>
+                            <div className="px-6 py-5 border-b border-sidebar-border mb-2">
+                                <h1 className="text-xl font-bold tracking-tight text-foreground">Hefestus</h1>
+                                <p className="text-xs text-muted-foreground mt-0.5">Forje a sua carreira</p>
+                            </div>
+                            {navigationItems(() => setIsMobileOpen(false))}
+                        </div>
+                        {userInfoSection}
+                    </DialogContent>
+                </Dialog>
             </div>
 
-            {user && (
-                <div className="p-4 border-t flex flex-col gap-2 bg-zinc-50/50">
-                    <div className="px-2 py-1 flex flex-col">
-                        <span className="text-sm font-semibold truncate text-zinc-950">{user.name || 'Candidato'}</span>
-                        <span className="text-xs text-zinc-500 truncate">{user.email}</span>
+            {/* Sidebar Lateral Desktop (visível apenas em md+) */}
+            <div className="hidden md:flex w-64 bg-sidebar border-r border-sidebar-border flex flex-col justify-between h-screen sticky top-0 z-40">
+                <div>
+                    <div className="px-8 py-6">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">Hefestus</h1>
+                        <p className="text-sm text-muted-foreground mt-0.5">Forje a sua carreira</p>
                     </div>
-                    <Button 
-                        variant="ghost" 
-                        className="justify-start text-red-500 hover:text-red-500 hover:bg-red-50/50"
-                        onClick={() => logoutUser()}
-                    >
-                        <LogOut className="size-4 mr-2" />
-                        Sair
-                    </Button>
+                    {navigationItems()}
                 </div>
-            )}
-        </div>
+                {userInfoSection}
+            </div>
+        </>
     )
 }

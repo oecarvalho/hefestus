@@ -18,6 +18,7 @@ import { BirthdayField } from "./birthdayPopover";
 import { ExperienceCard } from "./experienceCard";
 import { EducationCard } from "./educationCards";
 import { ProjectsCard } from "./projects";
+import { Loader2 } from "lucide-react";
 import { LanguagesCard } from "./languageCards";
 
 import { TagsField } from "../tagField";
@@ -293,17 +294,15 @@ export default function CurriculoForm({
     };
 
     return (
-        <section className="h-full max-w-6xl w-full px-4 m-auto py-16">
+        <section className="h-full max-w-6xl w-full px-4 mx-auto py-16">
 
-            <div className="flex justify-between items-end">
+            <div className="flex justify-between items-end mb-8 pb-4 border-b border-border/40">
                 <div>
-                    <h1 className="text-3xl font-bold">
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
                         Currículo Base
                     </h1>
-
-                    <p className="text-muted-foreground text-sm">
-                        Preencha as informações abaixo.
-                        Esse currículo será a base para gerarmos versões personalizadas.
+                    <p className="text-sm text-muted-foreground">
+                        Cadastre suas informações principais para personalizar com IA de acordo com as vagas.
                     </p>
                 </div>
             </div>
@@ -322,10 +321,10 @@ export default function CurriculoForm({
                                 </CardTitle>
                             </CardHeader>
 
-                            <CardContent className="grid grid-cols-2 gap-4">
+                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                                 <Field>
-                                    <FieldLabel className="font-medium text-muted-foreground text-xs">
+                                    <FieldLabel>
                                         Nome*
                                     </FieldLabel>
 
@@ -339,7 +338,7 @@ export default function CurriculoForm({
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel className="font-medium text-muted-foreground text-xs">
+                                    <FieldLabel>
                                         E-mail*
                                     </FieldLabel>
 
@@ -353,7 +352,7 @@ export default function CurriculoForm({
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel className="font-medium text-muted-foreground text-xs">
+                                    <FieldLabel>
                                         Telefone*
                                     </FieldLabel>
 
@@ -367,7 +366,7 @@ export default function CurriculoForm({
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel className="font-medium text-muted-foreground text-xs">
+                                    <FieldLabel>
                                         Data de nascimento
                                     </FieldLabel>
 
@@ -379,7 +378,7 @@ export default function CurriculoForm({
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel className="font-medium text-muted-foreground text-xs">
+                                    <FieldLabel>
                                         LinkedIn
                                     </FieldLabel>
 
@@ -393,7 +392,7 @@ export default function CurriculoForm({
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel className="font-medium text-muted-foreground text-xs">
+                                    <FieldLabel>
                                         Portfólio
                                     </FieldLabel>
 
@@ -422,7 +421,11 @@ export default function CurriculoForm({
                                 <Field>
                                     <Textarea
                                         {...form.register("resume.resume")}
+                                        placeholder="Escreva um resumo profissional detalhado das suas principais experiências e objetivos..."
                                     />
+                                    <FieldError>
+                                        {form.formState.errors.resume?.resume?.message}
+                                    </FieldError>
                                 </Field>
 
                             </CardContent>
@@ -432,7 +435,7 @@ export default function CurriculoForm({
 
                         <EducationCard />
 
-                        <div className="grid grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                             <Card>
 
@@ -479,8 +482,20 @@ export default function CurriculoForm({
                     </div>
 
                     <div className="flex justify-end mt-8 mb-16">
-                        <Button type="submit" size="lg" className="px-8 font-medium">
-                            Salvar Currículo
+                        <Button 
+                            type="submit" 
+                            size="lg" 
+                            className="px-8 font-medium gap-2"
+                            disabled={form.formState.isSubmitting}
+                        >
+                            {form.formState.isSubmitting ? (
+                                <>
+                                    <Loader2 className="animate-spin size-4" />
+                                    Salvando...
+                                </>
+                            ) : (
+                                "Salvar Currículo"
+                            )}
                         </Button>
                     </div>
 

@@ -12,9 +12,13 @@ import { toast } from "sonner";
 export function GenerateResumeButton({
   jobId,
   userId,
+  jobTitle,
+  nameEnterprise,
 }: {
   jobId: string
   userId: string
+  jobTitle: string
+  nameEnterprise: string
 }) {
 
   const [isPending, startTransition]
@@ -30,16 +34,33 @@ export function GenerateResumeButton({
             userId
           );
 
-        const link = document.createElement("a");
+        // Converter base64 em blob
+        const byteCharacters = atob(result.file);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "application/pdf" });
+        const blobUrl = URL.createObjectURL(blob);
 
-        link.href =
-          `data:application/pdf;base64,${result.file}`;
+        const sanitizedTitle = jobTitle.replace(/[^a-zA-Z0-9]/g, "_");
+        const sanitizedEnterprise = nameEnterprise.replace(/[^a-zA-Z0-9]/g, "_");
+        const fileName = `curriculo_${sanitizedEnterprise}_${sanitizedTitle}.pdf`;
 
-        link.download =
-          "curriculo.pdf";
-
-        link.click();
-        toast.success("Currículo personalizado gerado com sucesso!");
+        // Tentar abrir na nova aba
+        const newTab = window.open(blobUrl, "_blank");
+        
+        if (!newTab) {
+          // Se bloqueado pelo navegador, faz download
+          const link = document.createElement("a");
+          link.href = blobUrl;
+          link.download = fileName;
+          link.click();
+          toast.success("Currículo gerado! Download iniciado.");
+        } else {
+          toast.success("Currículo gerado! Visualização aberta em nova aba.");
+        }
       } catch (error) {
         console.error('Erro ao gerar currículo:', error);
         const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro ao gerar o currículo.";

@@ -6,7 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const months = [
     { label: "Jan", value: "01" },
@@ -71,6 +82,7 @@ export function ExperienceCard() {
 
                     <Button
                         type="button"
+                        className="gap-2"
                         onClick={() =>
                             append({
                                 enterpriseName: "",
@@ -88,16 +100,16 @@ export function ExperienceCard() {
                             })
                         }
                     >
-                        <Plus />
+                        <Plus size={16} />
                         Adicionar
                     </Button>
                 </div>
             </CardHeader>
 
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
                 {fields.map((field, index) => (
-                    <Card key={field.id}>
-                        <CardContent className="grid grid-cols-2 gap-4">
+                    <Card key={field.id} className="border border-muted-foreground/10 bg-muted/10">
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
 
                             {/* EMPRESA */}
                             <Field>
@@ -166,7 +178,7 @@ export function ExperienceCard() {
                                             {...register(
                                                 `experience.${index}.jobStart.month`
                                             )}
-                                            className="border rounded p-2 w-full"
+                                            className="flex h-9 w-full rounded-md border border-input bg-background px-2 py-1 text-sm shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                                         >
                                             <option value="">Mês</option>
 
@@ -184,7 +196,7 @@ export function ExperienceCard() {
                                             {...register(
                                                 `experience.${index}.jobStart.year`
                                             )}
-                                            className="border rounded p-2 w-full"
+                                            className="flex h-9 w-full rounded-md border border-input bg-background px-2 py-1 text-sm shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                                         >
                                             <option value="">Ano</option>
 
@@ -217,7 +229,7 @@ export function ExperienceCard() {
                                             {...register(
                                                 `experience.${index}.jobEnd.month`
                                             )}
-                                            className="border rounded p-2 w-full"
+                                            className="flex h-9 w-full rounded-md border border-input bg-background px-2 py-1 text-sm shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                                         >
                                             <option value="">Mês</option>
 
@@ -235,7 +247,7 @@ export function ExperienceCard() {
                                             {...register(
                                                 `experience.${index}.jobEnd.year`
                                             )}
-                                            className="border rounded p-2 w-full"
+                                            className="flex h-9 w-full rounded-md border border-input bg-background px-2 py-1 text-sm shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                                         >
                                             <option value="">Ano</option>
 
@@ -260,7 +272,7 @@ export function ExperienceCard() {
                             </div>
 
                             {/* DESCRIÇÃO */}
-                            <Field className="col-span-2">
+                            <Field className="col-span-1 md:col-span-2">
                                 <FieldLabel>Descrição</FieldLabel>
 
                                 <Textarea
@@ -278,14 +290,36 @@ export function ExperienceCard() {
                             </Field>
 
                             {/* REMOVER */}
-                            <div className="col-span-2 flex justify-end">
-                                <Button
-                                    type="button"
-                                    variant="destructive"
-                                    onClick={() => remove(index)}
-                                >
-                                    Remover
-                                </Button>
+                            <div className="col-span-1 md:col-span-2 flex justify-end">
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="gap-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50/50 dark:hover:bg-rose-950/20"
+                                        >
+                                            <Trash size={16} />
+                                            Remover
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Deseja remover esta experiência?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                Esta ação removerá permanentemente os dados preenchidos para esta experiência do seu currículo.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                            <AlertDialogAction 
+                                                onClick={() => remove(index)} 
+                                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                            >
+                                                Remover
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                             </div>
 
                         </CardContent>

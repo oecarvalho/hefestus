@@ -57,7 +57,7 @@ export default function JobsSearch(){
     }, [inputValue, router, pathname, searchParams]);
 
     return (
-        <InputGroup className="max-w-full">
+        <InputGroup className="flex-1 max-w-full">
 
             <InputGroupInput
                 placeholder="Buscar por cargo ou empresa..."

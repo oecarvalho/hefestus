@@ -79,6 +79,27 @@ export function CardJobs({ job, match }: CardJobsProps) {
         });
     }
 
+    const getMatchColors = (score: number) => {
+        if (score >= 75) {
+            return {
+                text: "text-emerald-600 dark:text-emerald-400",
+                bg: "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-800/30"
+            };
+        }
+        if (score >= 45) {
+            return {
+                text: "text-primary",
+                bg: "bg-primary/10 border-primary/20 dark:bg-primary/10 dark:border-primary/30"
+            };
+        }
+        return {
+            text: "text-rose-600 dark:text-rose-400",
+            bg: "bg-rose-50 dark:bg-rose-950/20 border-rose-200/50 dark:border-rose-800/30"
+        };
+    };
+
+    const matchColors = getMatchColors(match.matchScore);
+
     return (
 
         <Card>
@@ -95,12 +116,12 @@ export function CardJobs({ job, match }: CardJobsProps) {
                         {job.workModel}
                     </div>
                 </CardDescription>
-                <CardAction className="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-zinc-100">
-                    <span className="text-lg font-bold leading-none text-red-400">
+                <CardAction className={`flex h-16 w-16 flex-col items-center justify-center rounded-full border ${matchColors.bg}`}>
+                    <span className={`text-lg font-bold leading-none ${matchColors.text}`}>
                        {match.matchScore}%
                     </span>
 
-                    <span className="text-[10px] font-medium text-zinc-400">
+                    <span className="text-[10px] font-medium text-muted-foreground mt-0.5">
                         match
                     </span>
                 </CardAction>
@@ -120,16 +141,16 @@ export function CardJobs({ job, match }: CardJobsProps) {
                     </SelectContent>
                 </Select>
 
-
-
-                <Badge> {mounted ? getDaysAgo(job.date) : "..."}</Badge>
+                <Badge variant="secondary" className="font-normal"> 
+                    {mounted ? getDaysAgo(job.date) : "..."}
+                </Badge>
             </CardContent>
             <CardFooter className="flex items-center justify-between pt-2 border-t">
 
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant='outline'>
-                            <Trash />
+                        <Button variant="outline" className="gap-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50/50 dark:hover:bg-rose-950/20">
+                            <Trash size={16} />
                             Excluir
                         </Button>
                     </AlertDialogTrigger>
@@ -146,12 +167,12 @@ export function CardJobs({ job, match }: CardJobsProps) {
                     </AlertDialogContent>
                 </AlertDialog>
 
-                <Link href={`/jobs/${job.id}`}>
-                    <Button>
+                <Button className="gap-2" asChild>
+                    <Link href={`/jobs/${job.id}`}>
                         Detalhes
-                        <ExternalLink />
-                    </Button>
-                </Link>
+                        <ExternalLink size={16} />
+                    </Link>
+                </Button>
             </CardFooter>
         </Card>
     )

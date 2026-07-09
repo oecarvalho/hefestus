@@ -21,7 +21,7 @@ export function TagsField({
 
   return (
     <Field>
-      <FieldLabel className="text-xs text-muted-foreground">
+      <FieldLabel>
         {label}
       </FieldLabel>
 
