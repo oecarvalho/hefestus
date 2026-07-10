@@ -46,14 +46,36 @@ describe('calculateMatch', () => {
     expect(result.missingSkills).toEqual([]);
   });
 
-  test('deve dar match ignorando versões específicas de tecnologias', () => {
+  test('deve dar match ignorando versões específicas de tecnologias mesmo coladas no nome', () => {
     const result = calculateMatch({
-      jobSkills: ['Python 3', 'Java 17', 'Angular 12'],
-      curriculumSkills: ['python', 'java', 'angular']
+      jobSkills: ['html', 'css', 'Python 3', 'Java 17', 'Angular 12'],
+      curriculumSkills: ['HTML5', 'CSS3', 'python', 'java', 'angular']
     });
 
     expect(result.matchScore).toBe(100);
-    expect(result.matchingSkills).toEqual(['Python 3', 'Java 17', 'Angular 12']);
+    expect(result.matchingSkills).toEqual(['html', 'css', 'Python 3', 'Java 17', 'Angular 12']);
+    expect(result.missingSkills).toEqual([]);
+  });
+
+  test('deve respeitar exceções de números como s3 e web3', () => {
+    const result = calculateMatch({
+      jobSkills: ['AWS S3', 'Web3'],
+      curriculumSkills: ['s3', 'web3']
+    });
+
+    expect(result.matchScore).toBe(100);
+    expect(result.matchingSkills).toEqual(['AWS S3', 'Web3']);
+    expect(result.missingSkills).toEqual([]);
+  });
+
+  test('deve dar match em traduções comuns como desenvolvimento responsivo e ui/ux', () => {
+    const result = calculateMatch({
+      jobSkills: ['desenvolvimento responsivo', 'ui/ux'],
+      curriculumSkills: ['Responsive Design', 'design de interface']
+    });
+
+    expect(result.matchScore).toBe(100);
+    expect(result.matchingSkills).toEqual(['desenvolvimento responsivo', 'ui/ux']);
     expect(result.missingSkills).toEqual([]);
   });
 

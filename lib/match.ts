@@ -6,13 +6,27 @@ interface CalculateMatchProps {
 export function canonicalizeSkill(skill: string): string {
   let s = skill.toLowerCase().trim();
 
-  // 1. Remover sufixos de versão comuns (ex: react 18 -> react, java 17 -> java)
+  // 1. Tratar exceções conhecidas de nomes com números antes de separar (ex: s3, web3)
+  const exceptions: Record<string, string> = {
+    's3': 's3',
+    'aws s3': 's3',
+    'web3': 'web3',
+  };
+
+  if (exceptions[s]) {
+    return exceptions[s];
+  }
+
+  // 2. Separar letras de números no final (ex: html5 -> html 5, css3 -> css 3, java17 -> java 17, es6 -> es 6)
+  s = s.replace(/([a-zA-Z]+)(\d+)/g, '$1 $2');
+
+  // 3. Remover sufixos de versão comuns (ex: react 18 -> react, java 17 -> java, angular 12 -> angular)
   s = s.replace(/\b\d+(\.\d+)*\b/g, '').trim();
 
-  // 2. Remover pontuações/separadores comuns para padronizar
+  // 4. Remover pontuações/separadores comuns para padronizar
   s = s.replace(/[\s\-_.]/g, '');
 
-  // 3. Mapear apelidos/sinônimos comuns
+  // 5. Mapear apelidos/sinônimos comuns e traduções
   const aliases: Record<string, string> = {
     'reactjs': 'react',
     'react': 'react',
@@ -42,6 +56,20 @@ export function canonicalizeSkill(skill: string): string {
     'dockercontainer': 'docker',
     'kubernetes': 'k8s',
     'k8s': 'k8s',
+    
+    // Traduções e normalizações identificadas
+    'desenvolvimentoresponsivo': 'responsive',
+    'responsivedesign': 'responsive',
+    'responsividade': 'responsive',
+    'uiux': 'uiux',
+    'ui/ux': 'uiux',
+    'designuiux': 'uiux',
+    'designinterface': 'uiux',
+    'designinterfaceusuario': 'uiux',
+    'designdeinterface': 'uiux',
+    'experienciausuario': 'uiux',
+    'userexperience': 'uiux',
+    'userinterface': 'uiux',
   };
 
   if (aliases[s]) {

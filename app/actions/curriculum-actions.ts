@@ -297,6 +297,9 @@ noStore();
   });
 
   revalidatePath('/curriculo');
+  revalidatePath('/jobs');
+  revalidatePath('/relatorio');
+  revalidatePath('/');
 }
 
 export async function getCurriculum(userId: string) {
