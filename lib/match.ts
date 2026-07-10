@@ -3,6 +3,62 @@ interface CalculateMatchProps {
   curriculumSkills: string[]
 }
 
+export function canonicalizeSkill(skill: string): string {
+  let s = skill.toLowerCase().trim();
+
+  // 1. Remover sufixos de versão comuns (ex: react 18 -> react, java 17 -> java)
+  s = s.replace(/\b\d+(\.\d+)*\b/g, '').trim();
+
+  // 2. Remover pontuações/separadores comuns para padronizar
+  s = s.replace(/[\s\-_.]/g, '');
+
+  // 3. Mapear apelidos/sinônimos comuns
+  const aliases: Record<string, string> = {
+    'reactjs': 'react',
+    'react': 'react',
+    'nodejs': 'node',
+    'node': 'node',
+    'nextjs': 'next',
+    'next': 'next',
+    'nestjs': 'nest',
+    'nest': 'nest',
+    'vuejs': 'vue',
+    'vue': 'vue',
+    'nuxtjs': 'nuxt',
+    'nuxt': 'nuxt',
+    'angularjs': 'angular',
+    'typescript': 'typescript',
+    'ts': 'typescript',
+    'javascript': 'javascript',
+    'js': 'javascript',
+    'postgresql': 'postgres',
+    'postgres': 'postgres',
+    'amazonwebservices': 'aws',
+    'rest': 'rest',
+    'restapi': 'rest',
+    'restful': 'rest',
+    'restfulapi': 'rest',
+    'dockercontainers': 'docker',
+    'dockercontainer': 'docker',
+    'kubernetes': 'k8s',
+    'k8s': 'k8s',
+  };
+
+  if (aliases[s]) {
+    return aliases[s];
+  }
+
+  // Se terminar com 'js' ou 'ts' e for uma palavra maior, normaliza removendo
+  // Ex: reactjs -> react, vuejs -> vue, nestjs -> nest
+  if (s.endsWith('js') && s.length > 2) {
+    const base = s.slice(0, -2);
+    if (aliases[base]) return aliases[base];
+    return base;
+  }
+
+  return s;
+}
+
 export function calculateMatch({
   jobSkills,
   curriculumSkills
@@ -16,30 +72,37 @@ export function calculateMatch({
     };
   }
 
-  const normalizedJobSkills =
-    jobSkills.map(skill =>
-      skill.toLowerCase().trim()
-    );
+  // 1. Deduplicar as habilidades da vaga com base no valor canônico
+  const uniqueJobSkills: string[] = [];
+  const seenJobKeys = new Set<string>();
 
-  const normalizedCurriculumSkills =
-    curriculumSkills.map(skill =>
-      skill.toLowerCase().trim()
-    );
+  for (const skill of jobSkills) {
+    const key = canonicalizeSkill(skill);
+    if (key && !seenJobKeys.has(key)) {
+      seenJobKeys.add(key);
+      uniqueJobSkills.push(skill);
+    }
+  }
 
-  const matchingSkills =
-    normalizedJobSkills.filter(skill =>
-      normalizedCurriculumSkills.includes(skill)
-    );
-
-  const missingSkills =
-    normalizedJobSkills.filter(skill =>
-      !normalizedCurriculumSkills.includes(skill)
-    );
-
-  const matchScore = Math.round(
-    (matchingSkills.length /
-      normalizedJobSkills.length) * 100
+  // 2. Criar conjunto de chaves canônicas do currículo para comparação rápida
+  const canonicalCurriculumSkills = new Set(
+    curriculumSkills.map(skill => canonicalizeSkill(skill))
   );
+
+  // 3. Filtrar as habilidades que dão match (preservando o formato original da vaga)
+  const matchingSkills = uniqueJobSkills.filter(skill =>
+    canonicalCurriculumSkills.has(canonicalizeSkill(skill))
+  );
+
+  // 4. Filtrar as habilidades faltantes (preservando o formato original da vaga)
+  const missingSkills = uniqueJobSkills.filter(skill =>
+    !canonicalCurriculumSkills.has(canonicalizeSkill(skill))
+  );
+
+  // 5. Calcular o score com base nos requisitos únicos deduplicados
+  const matchScore = uniqueJobSkills.length > 0
+    ? Math.round((matchingSkills.length / uniqueJobSkills.length) * 100)
+    : 0;
 
   return {
     matchingSkills,
