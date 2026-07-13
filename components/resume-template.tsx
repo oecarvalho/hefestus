@@ -6,99 +6,116 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 
+// Helper function to parse markdown bold (**) into inline elements for react-pdf
+function parseTextWithBold(text: string) {
+  if (!text) return "";
+  const parts = text.split("**");
+  return parts.map((part, index) => {
+    if (index % 2 === 1) {
+      return (
+        <Text key={index} style={{ fontWeight: "bold" }}>
+          {part}
+        </Text>
+      );
+    }
+    return part;
+  });
+}
+
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 28,
+    paddingTop: 30,
     paddingBottom: 32,
     paddingHorizontal: 34,
-    fontSize: 10,
+    fontSize: 9.5,
     fontFamily: "Helvetica",
-    lineHeight: 1.4,
-    color: "#111827",
+    lineHeight: 1.45,
+    color: "#1F2937",
   },
 
   // HEADER
 
   header: {
-    marginBottom: 16,
+    marginBottom: 14,
     borderBottomWidth: 1,
     borderBottomColor: "#E5E7EB",
-    paddingBottom: 12,
+    paddingBottom: 10,
   },
 
   name: {
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 6,
+    color: "#111827",
   },
 
-  contactContainer: {
-    flexDirection: "column",
-  },
-
-  contactRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 3,
-  },
-
-  contact: {
-    fontSize: 9,
+  contactLine: {
+    fontSize: 8.5,
     color: "#4B5563",
-    marginRight: 14,
+    lineHeight: 1.4,
   },
 
   // SECTION
 
   section: {
-    marginBottom: 14,
+    marginBottom: 12,
+  },
+
+  sectionHeader: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#D1D5DB",
+    paddingBottom: 2,
+    marginBottom: 6,
+    marginTop: 4,
   },
 
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "bold",
     textTransform: "uppercase",
-    marginBottom: 6,
-    color: "#2563EB",
-    letterSpacing: 0.5,
+    color: "#1E3A8A", // Premium navy blue
+    letterSpacing: 0.8,
   },
 
   text: {
-    fontSize: 10,
-    color: "#1F2937",
+    fontSize: 9,
+    color: "#374151",
+    lineHeight: 1.45,
   },
 
   // EXPERIENCE
 
   item: {
-    marginBottom: 10,
+    marginBottom: 8,
   },
 
   itemHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "baseline",
     marginBottom: 2,
   },
 
   itemTitle: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: "bold",
+    color: "#111827",
   },
 
   period: {
-    fontSize: 9,
+    fontSize: 8.5,
     color: "#6B7280",
   },
 
   company: {
-    fontSize: 9,
-    color: "#374151",
+    fontSize: 8.5,
+    color: "#4B5563",
     marginBottom: 3,
   },
 
   description: {
-    fontSize: 9.5,
-    color: "#1F2937",
+    fontSize: 9,
+    color: "#374151",
     lineHeight: 1.45,
   },
 
@@ -107,27 +124,29 @@ const styles = StyleSheet.create({
   skillsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
+    marginTop: 2,
   },
 
   skill: {
-    fontSize: 9,
-    paddingVertical: 3,
-    paddingHorizontal: 7,
-    borderRadius: 4,
-    backgroundColor: "#EFF6FF",
-    color: "#1D4ED8",
-    marginRight: 6,
-    marginBottom: 6,
+    fontSize: 8,
+    paddingVertical: 2.5,
+    paddingHorizontal: 5.5,
+    borderRadius: 3,
+    backgroundColor: "#F1F5F9", // Premium slate gray badge
+    color: "#334155", // Slate gray text
+    marginRight: 4,
+    marginBottom: 4,
   },
 
   // IDIOMAS
   languagesContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
+    marginTop: 2,
   },
   languageItem: {
-    fontSize: 9,
-    marginRight: 16,
+    fontSize: 8.5,
+    marginRight: 14,
     marginBottom: 4,
     color: "#374151",
   },
@@ -191,37 +210,16 @@ export function ResumeTemplate({
             {personalInfo.name}
           </Text>
 
-          <View style={styles.contactContainer}>
-
-            <View style={styles.contactRow}>
-
-              <Text style={styles.contact}>
-                {personalInfo.email}
-              </Text>
-
-              <Text style={styles.contact}>
-                {personalInfo.phoneNumber}
-              </Text>
-
-            </View>
-
-            <View style={styles.contactRow}>
-
-              {personalInfo.linkedin && (
-                <Text style={styles.contact}>
-                  {personalInfo.linkedin}
-                </Text>
-              )}
-
-              {personalInfo.portfolio && (
-                <Text style={styles.contact}>
-                  {personalInfo.portfolio}
-                </Text>
-              )}
-
-            </View>
-
-          </View>
+          <Text style={styles.contactLine}>
+            {[
+              personalInfo.email,
+              personalInfo.phoneNumber,
+              personalInfo.linkedin,
+              personalInfo.portfolio,
+            ]
+              .filter(Boolean)
+              .join("   •   ")}
+          </Text>
 
         </View>
 
@@ -229,12 +227,14 @@ export function ResumeTemplate({
 
         <View style={styles.section}>
 
-          <Text style={styles.sectionTitle}>
-            Resumo Profissional
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
+              Resumo Profissional
+            </Text>
+          </View>
 
           <Text style={styles.text}>
-            {data.summary}
+            {parseTextWithBold(data.summary)}
           </Text>
 
         </View>
@@ -243,9 +243,11 @@ export function ResumeTemplate({
 
         <View style={styles.section}>
 
-          <Text style={styles.sectionTitle}>
-            Competências Técnicas
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
+              Competências Técnicas
+            </Text>
+          </View>
 
           <View style={styles.skillsContainer}>
             {data.skills.map((skill) => (
@@ -261,12 +263,14 @@ export function ResumeTemplate({
 
         <View style={styles.section}>
 
-          <Text style={styles.sectionTitle}>
-            Experiência Profissional
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
+              Experiência Profissional
+            </Text>
+          </View>
 
-          {data.experiences.map((exp) => (
-            <View key={exp.enterpriseName} style={styles.item}>
+          {data.experiences.map((exp, idx) => (
+            <View key={`${exp.enterpriseName}-${idx}`} style={styles.item}>
 
               <View style={styles.itemHeader}>
 
@@ -285,7 +289,7 @@ export function ResumeTemplate({
               </Text>
 
               <Text style={styles.description}>
-                {exp.description}
+                {parseTextWithBold(exp.description)}
               </Text>
 
             </View>
@@ -297,19 +301,21 @@ export function ResumeTemplate({
 
         <View style={styles.section}>
 
-          <Text style={styles.sectionTitle}>
-            Projetos
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
+              Projetos
+            </Text>
+          </View>
 
-          {data.projects.map((project) => (
-            <View key={project.projectName} style={styles.item}>
+          {data.projects.map((project, idx) => (
+            <View key={`${project.projectName}-${idx}`} style={styles.item}>
 
               <Text style={styles.itemTitle}>
                 {project.projectName}
               </Text>
 
               <Text style={styles.description}>
-                {project.projectDescription}
+                {parseTextWithBold(project.projectDescription)}
               </Text>
 
             </View>
@@ -321,9 +327,11 @@ export function ResumeTemplate({
 
         {data.educations && data.educations.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Formação Acadêmica
-            </Text>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>
+                Formação Acadêmica
+              </Text>
+            </View>
             {data.educations.map((edu, idx) => (
               <View key={idx} style={styles.item}>
                 <View style={styles.itemHeader}>
@@ -339,7 +347,7 @@ export function ResumeTemplate({
                 </Text>
                 {edu.description ? (
                   <Text style={styles.description}>
-                    {edu.description}
+                    {parseTextWithBold(edu.description)}
                   </Text>
                 ) : null}
               </View>
@@ -351,9 +359,11 @@ export function ResumeTemplate({
 
         {data.languages && data.languages.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Idiomas
-            </Text>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>
+                Idiomas
+              </Text>
+            </View>
             <View style={styles.languagesContainer}>
               {data.languages.map((lang, idx) => (
                 <Text key={idx} style={styles.languageItem}>
