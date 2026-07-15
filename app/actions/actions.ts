@@ -41,7 +41,7 @@ export async function createNewJob(data: CreateNewJobProps) {
     validated.jobDescription
   );
 
-  await prisma.job.create({
+  const createdJob = await prisma.job.create({
     data: {
       userId: session.userId,
       jobTitle: validated.title,
@@ -51,6 +51,14 @@ export async function createNewJob(data: CreateNewJobProps) {
       status: validated.jobStatus,
       extractedSkills: skills
     },
+  })
+
+  await prisma.jobActivity.create({
+    data: {
+      jobId: createdJob.id,
+      type: 'status_change',
+      description: 'Candidatura cadastrada no sistema.'
+    }
   })
 
   revalidatePath('/jobs');
@@ -117,16 +125,38 @@ export async function updateJobStatus(id: string, status: string) {
       }
     }
 
-    await prisma.job.update({
-      where: {
-        id: validatedId,
-      },
-      data: {
-        status: validatedStatus,
-      },
-    });
+    const statusLabels: Record<string, string> = {
+      aplicado: 'Aplicado',
+      andamento: 'Em Andamento',
+      rejeitado: 'Rejeitado',
+      cancelado: 'Cancelada',
+    };
+
+    const statusLabel = statusLabels[validatedStatus] || validatedStatus;
+
+    await prisma.$transaction([
+      prisma.job.update({
+        where: {
+          id: validatedId,
+        },
+        data: {
+          status: validatedStatus,
+          lastActivityAt: new Date(),
+          alertCycle: 0,
+          autoCanceledAlertPending: false,
+        },
+      }),
+      prisma.jobActivity.create({
+        data: {
+          jobId: validatedId,
+          type: 'status_change',
+          description: `Status alterado para "${statusLabel}".`
+        }
+      })
+    ]);
 
     revalidatePath('/jobs');
+    revalidatePath(`/jobs/${validatedId}`);
 
     return { success: true };
 

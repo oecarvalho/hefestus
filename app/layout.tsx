@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 };
 
 import { getSession } from "@/lib/auth";
+import { InactivityAlertManager } from "@/components/inactivity-alert-manager";
 
 export default async function RootLayout({
   children,
@@ -50,6 +51,7 @@ export default async function RootLayout({
           <main className="flex-1">
             {children}
           </main>
+          {session && <InactivityAlertManager />}
           <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>

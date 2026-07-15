@@ -34,7 +34,25 @@ model Job {
   
   extractedSkills Json?
 
+  // Novos campos para gerenciamento de inatividade
+  lastActivityAt DateTime @default(now())
+  alertCycle Int @default(0)
+  autoCanceledAlertPending Boolean @default(false)
+
+  activities JobActivity[]
+
   @@map("job")
+}
+
+model JobActivity {
+  id          String   @id @default(cuid())
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  type        String   // 'status_change', 'custom_activity', 'callback_received', 'interview', 'technical_test', 'reactivation', 'auto_canceled'
+  description String
+  date        DateTime @default(now())
+
+  @@map("job_activities")
 }
 
 model Curriculum{
