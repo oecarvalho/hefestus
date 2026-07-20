@@ -16,6 +16,7 @@ model User {
 
   curriculum Curriculum?
   jobs Job[]
+  marketStudies MarketStudy[]
 
   @@map("users")
 }
@@ -148,4 +149,32 @@ model Language {
   curriculum    Curriculum @relation(fields: [curriculumId], references: [id])
 
   @@map("languages")
+}
+
+model MarketStudy {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @default(now()) @updatedAt
+  vacancies   MarketVacancy[]
+
+  @@map("market_studies")
+}
+
+model MarketVacancy {
+  id            String      @id @default(cuid())
+  studyId       String
+  study         MarketStudy @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  enterprise    String
+  role          String
+  url           String?
+  description   String
+  extractedData Json?       // Dados estruturados extraídos pela IA
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
+
+  @@map("market_vacancies")
 }

@@ -1,5 +1,5 @@
 'use client'
-import { Briefcase, FileChartLine, FileText, LayoutGrid, LogOut, Menu } from "lucide-react"
+import { Briefcase, FileChartLine, FileText, LayoutGrid, LogOut, Menu, TrendingUp } from "lucide-react"
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -25,7 +25,7 @@ export const Sidebar = ({ user }: SidebarProps) => {
 
     const navigationItems = (onItemClick?: () => void) => {
         const getButtonClass = (path: string) => {
-            const isActive = pathname === path;
+            const isActive = pathname === path || pathname.startsWith(path + '/');
             return cn(
                 "justify-start gap-2 transition-all border-l-2 pl-3 rounded-l-none w-full",
                 isActive 
@@ -58,6 +58,12 @@ export const Sidebar = ({ user }: SidebarProps) => {
                     <Link href='/relatorio'>
                         <FileChartLine size={18} />
                         Relatório
+                    </Link>
+                </Button>
+                <Button variant="ghost" className={getButtonClass('/mercado')} asChild onClick={onItemClick}>
+                    <Link href='/mercado'>
+                        <TrendingUp size={18} />
+                        Mercado
                     </Link>
                 </Button>
             </div>
