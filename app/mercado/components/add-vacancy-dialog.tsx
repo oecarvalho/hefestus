@@ -84,7 +84,7 @@ export function AddVacancyDialog({ studyId }: AddVacancyDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="overflow-y-auto max-h-[75vh] pr-2 space-y-4 pt-2">
           <FieldGroup>
             <div className="grid grid-cols-2 gap-4">
               <Field>
